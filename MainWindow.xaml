@@ -5,8 +5,36 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MySermonsWPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="MySermons" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="MajorControlStyle" TargetType="Control">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+    </Window.Resources>
+    <DockPanel LastChildFill="True">
+        <Menu x:Name="MenuBar"
+              DockPanel.Dock="Top"
+              Style="{StaticResource MajorControlStyle}">
+            <MenuItem Header="File"></MenuItem>
+            <MenuItem Header="Edit"></MenuItem>
+            <MenuItem Header="Options"></MenuItem>
+            <MenuItem Header="Help"></MenuItem>
+        </Menu>
+        <TreeView x:Name="TreeviewDocs"
+                  DockPanel.Dock="Left"
+                  Style="{StaticResource MajorControlStyle}"
+                  Width="164">
+
+        </TreeView>
+        <StatusBar x:Name="StatusBar"
+                   DockPanel.Dock="Bottom"
+                   Style="{StaticResource MajorControlStyle}">
+
+        </StatusBar>
+        <TabControl x:Name="TabControl"
+                    Style="{StaticResource MajorControlStyle}">
+
+        </TabControl>
+    </DockPanel>
 </Window>
