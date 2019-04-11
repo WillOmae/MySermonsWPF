@@ -72,7 +72,8 @@ namespace MySermonsWPF.Data
         /// <summary>
         /// Location constructor: used when only the name is known.
         /// </summary>
-        /// <param name="Name">Location name.</param>
+        /// <param name="name">Location name.</param>
+        /// <param name="stringType">String type.</param>
         public Location(string name, StringType stringType)
         {
             Location location = Read(name, stringType);
@@ -92,10 +93,10 @@ namespace MySermonsWPF.Data
         /// <summary>
         /// Location constructor: used when only the ID is known.
         /// </summary>
-        /// <param name="ID"></param>
-        public Location(long ID)
+        /// <param name="id"></param>
+        public Location(long id)
         {
-            Location location = Read(ID);
+            Location location = Read(id);
             if(location == null)
             {
                 throw new Exception("The location with the set id was not found.");
@@ -212,13 +213,6 @@ namespace MySermonsWPF.Data
                 return result.Count < 1 ? null : result;
             }
             else return null;
-        }
-        /// <summary>
-        /// Used to specify if string is name or guid.
-        /// </summary>
-        public enum StringType
-        {
-            Name, Guid
         }
     }
 }
