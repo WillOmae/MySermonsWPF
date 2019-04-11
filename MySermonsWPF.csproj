@@ -101,6 +101,8 @@
     <Compile Include="Data\Database.cs" />
     <Compile Include="Data\Location.cs" />
     <Compile Include="Data\Sermon.cs" />
+    <Compile Include="Data\SermonFilters.cs" />
+    <Compile Include="Data\SortedSermons.cs" />
     <Compile Include="Data\StringType.cs" />
     <Compile Include="Data\Theme.cs" />
     <Compile Include="MainWindow.xaml.cs">
