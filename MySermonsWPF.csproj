@@ -99,13 +99,16 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Data\Database.cs" />
+    <Compile Include="Data\Location.cs" />
+    <Compile Include="Data\Sermon.cs" />
+    <Compile Include="Data\StringType.cs" />
+    <Compile Include="Data\Theme.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Location.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
