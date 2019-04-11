@@ -55,10 +55,10 @@ namespace MySermonsWPF.Data
         public static bool Initialise()
         {
             //since c# logically short circuits...first check existence, then check creation, then check existence again, then return false
-            if (!TableExists(TABLE_SERMONS) && !Create(CREATE_TABLE_SERMONS, TABLE_SERMONS) && !TableExists(TABLE_SERMONS)) return false;
-            if (!TableExists(TABLE_LOCATIONS) && !Create(CREATE_TABLE_LOCATIONS, TABLE_LOCATIONS) && !TableExists(TABLE_LOCATIONS)) return false;
-            if (!TableExists(TABLE_THEMES) && !Create(CREATE_TABLE_THEMES, TABLE_THEMES) && !TableExists(TABLE_THEMES)) return false;
-            if (!TableExists(TABLE_SERMON_THEMES) && !Create(CREATE_TABLE_SERMON_THEMES, TABLE_SERMON_THEMES) && !TableExists(TABLE_SERMON_THEMES)) return false;
+            if(!TableExists(TABLE_SERMONS) && !Create(CREATE_TABLE_SERMONS, TABLE_SERMONS) && !TableExists(TABLE_SERMONS)) return false;
+            if(!TableExists(TABLE_LOCATIONS) && !Create(CREATE_TABLE_LOCATIONS, TABLE_LOCATIONS) && !TableExists(TABLE_LOCATIONS)) return false;
+            if(!TableExists(TABLE_THEMES) && !Create(CREATE_TABLE_THEMES, TABLE_THEMES) && !TableExists(TABLE_THEMES)) return false;
+            if(!TableExists(TABLE_SERMON_THEMES) && !Create(CREATE_TABLE_SERMON_THEMES, TABLE_SERMON_THEMES) && !TableExists(TABLE_SERMON_THEMES)) return false;
 
             return true;
         }
@@ -93,7 +93,7 @@ namespace MySermonsWPF.Data
             /* simply query the sqlite_master table for the table name */
             string sql = "SELECT name FROM sqlite_master WHERE type='table' AND name=@tableName";
             List<Dictionary<string, object>> result = Read(sql, tableName);
-            return result != null && result.Count > 0 && (string) result[0]["name"] == tableName ? true : false;
+            return result != null && result.Count > 0 && (string)result[0]["name"] == tableName ? true : false;
         }
         /// <summary>
         /// Queries the sql statement, getting all instances of parameter names denoted by @.
@@ -105,10 +105,10 @@ namespace MySermonsWPF.Data
             // create regex for parameter names
             Regex regex = new Regex(@"@\w*");
             MatchCollection matches = regex.Matches(sql);
-            if (matches.Count > 0)
+            if(matches.Count > 0)
             {
                 string[] parameterNames = new string[matches.Count];
-                for (int i = 0; i < parameterNames.Length; i++)
+                for(int i = 0; i < parameterNames.Length; i++)
                 {
                     parameterNames[i] = matches[i].Value;
                 }
@@ -150,17 +150,17 @@ namespace MySermonsWPF.Data
         /// <returns>True if successful; false otherwise.</returns>
         public static bool Create(string sql, List<object> parameters, out long insertId)
         {
-            using (SQLiteConnection connection = new SQLiteConnection(CONNECTION_STRING))
+            using(SQLiteConnection connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand(sql, connection))
+                using(SQLiteCommand command = new SQLiteCommand(sql, connection))
                 {
-                    if (parameters != null)
+                    if(parameters != null)
                     {
                         string[] parameterNames = ExtractParameterNames(sql);
-                        if (parameterNames != null && parameterNames.Length == parameters.Count)
+                        if(parameterNames != null && parameterNames.Length == parameters.Count)
                         {
-                            for (int i = 0; i < parameterNames.Length; i++)
+                            for(int i = 0; i < parameterNames.Length; i++)
                             {
                                 command.Parameters.AddWithValue(parameterNames[i], parameters[i]);
                             }
@@ -169,7 +169,7 @@ namespace MySermonsWPF.Data
                     try
                     {
                         int rowsAffected = command.ExecuteNonQuery();
-                        if (rowsAffected > 0)
+                        if(rowsAffected > 0)
                         {
                             insertId = connection.LastInsertRowId;
                             return true;
@@ -207,38 +207,38 @@ namespace MySermonsWPF.Data
         /// <returns>SQLiteDataReader if successful; null otherwise</returns>
         public static List<Dictionary<string, object>> Read(string sql, List<object> parameters)
         {
-            using (SQLiteConnection connection = new SQLiteConnection(CONNECTION_STRING))
+            using(SQLiteConnection connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand(sql, connection))
+                using(SQLiteCommand command = new SQLiteCommand(sql, connection))
                 {
-                    if (parameters != null)
+                    if(parameters != null)
                     {
                         string[] parameterNames = ExtractParameterNames(sql);
-                        if (parameterNames != null && parameterNames.Length == parameters.Count)
+                        if(parameterNames != null && parameterNames.Length == parameters.Count)
                         {
-                            for (int i = 0; i < parameterNames.Length; i++)
+                            for(int i = 0; i < parameterNames.Length; i++)
                             {
                                 command.Parameters.AddWithValue(parameterNames[i], parameters[i]);
                             }
                         }
                     }
-                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    using(SQLiteDataReader reader = command.ExecuteReader())
                     {
-                        if (reader.HasRows)
+                        if(reader.HasRows)
                         {
                             // dictionary is for column cells, list for rows
                             List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
-                            while (reader.Read())
+                            while(reader.Read())
                             {
                                 Dictionary<string, object> row = new Dictionary<string, object>(reader.FieldCount);
-                                for (int i = 0; i < reader.FieldCount; i++)
+                                for(int i = 0; i < reader.FieldCount; i++)
                                 {
                                     row.Add(reader.GetName(i), reader.GetValue(i));
                                 }
                                 rows.Add(row);
                             }
-                            if (rows.Count > 0)
+                            if(rows.Count > 0)
                             {
                                 return rows;
                             }
