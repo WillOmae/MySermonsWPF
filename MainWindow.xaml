@@ -21,7 +21,7 @@
             <MenuItem Header="Options"></MenuItem>
             <MenuItem Header="Help"></MenuItem>
         </Menu>
-        <StatusBar x:Name="StatusBar"
+        <StatusBar x:Name="MSStatusBar"
                    DockPanel.Dock="Bottom"
                    Style="{StaticResource MajorControlStyle}">
             <TextBlock>
@@ -33,14 +33,13 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="4*"/>
             </Grid.ColumnDefinitions>
-            <TreeView x:Name="TreeviewDocs"
+            <TreeView x:Name="MSTreeview"
                       Grid.Column="0"
                       Grid.ColumnSpan="1"
                       Style="{StaticResource MajorControlStyle}">
 
             </TreeView>
-
-            <TabControl x:Name="TabControl"
+            <TabControl x:Name="MSTabControl"
                         Grid.Column="1"
                         Grid.ColumnSpan="1"
                         Style="{StaticResource MajorControlStyle}">
