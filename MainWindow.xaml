@@ -21,20 +21,31 @@
             <MenuItem Header="Options"></MenuItem>
             <MenuItem Header="Help"></MenuItem>
         </Menu>
-        <TreeView x:Name="TreeviewDocs"
-                  DockPanel.Dock="Left"
-                  Style="{StaticResource MajorControlStyle}"
-                  Width="164">
-
-        </TreeView>
         <StatusBar x:Name="StatusBar"
                    DockPanel.Dock="Bottom"
                    Style="{StaticResource MajorControlStyle}">
-
+            <TextBlock>
+                Ready!
+            </TextBlock>
         </StatusBar>
-        <TabControl x:Name="TabControl"
-                    Style="{StaticResource MajorControlStyle}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+            <TreeView x:Name="TreeviewDocs"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="1"
+                      Style="{StaticResource MajorControlStyle}">
 
-        </TabControl>
+            </TreeView>
+
+            <TabControl x:Name="TabControl"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="1"
+                        Style="{StaticResource MajorControlStyle}">
+
+            </TabControl>
+        </Grid>
     </DockPanel>
 </Window>
