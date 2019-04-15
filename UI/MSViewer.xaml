@@ -6,6 +6,17 @@
              xmlns:local="clr-namespace:MySermonsWPF.UI"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Print"
+                        CanExecute="PrintCommandCanExecute"
+                        Executed="PrintCommandExecuted"/>
+        <CommandBinding Command="ApplicationCommands.Delete"
+                        CanExecute="DeleteCommandCanExecute"
+                        Executed="DeleteCommandExecuted"/>
+        <CommandBinding Command="ApplicationCommands.SaveAs"
+                        CanExecute="SaveAsCommandCanExecute"
+                        Executed="SaveAsCommandExecuted"/>
+    </UserControl.CommandBindings>
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

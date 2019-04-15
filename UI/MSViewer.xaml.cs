@@ -1,4 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using MySermonsWPF.Data;
 
 namespace MySermonsWPF.UI
 {
@@ -7,6 +10,7 @@ namespace MySermonsWPF.UI
     /// </summary>
     public partial class MSViewer:UserControl
     {
+        private Sermon sermon;
         /// <summary>
         /// Rich text document manager.
         /// </summary>
@@ -20,7 +24,7 @@ namespace MySermonsWPF.UI
             {
                 return this.MSViewerTitle.Text;
             }
-            set
+            private set
             {
                 this.MSViewerTitle.Text = value;
             }
@@ -34,7 +38,7 @@ namespace MySermonsWPF.UI
             {
                 return this.documentManager.GetRichText();
             }
-            set
+            private set
             {
                 this.documentManager.SetRichText(value);
             }
@@ -42,10 +46,44 @@ namespace MySermonsWPF.UI
         /// <summary>
         /// Viewer constructor.
         /// </summary>
-        public MSViewer()
+        /// <param name="sermon">Sermon to be displayed.</param>
+        public MSViewer(Sermon sermon) : base()
         {
             this.InitializeComponent();
             this.documentManager = new MSDocumentManager(this.MSViewerContent);
+            this.sermon = sermon;
+            if(sermon != null)
+            {
+                this.ViewerTitle = this.sermon.Title;
+                this.ViewerContent = this.sermon.Content;
+            }
+        }
+        private void PrintCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("Printing...");
+        }
+        private void PrintCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.sermon != null ? true : false;
+        }
+        private void DeleteCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            if(this.sermon.Delete())
+            {
+                MessageBox.Show("Deleting...");
+            }
+        }
+        private void DeleteCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.sermon != null ? true : false;
+        }
+        private void SaveAsCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("Saving as...");
+        }
+        private void SaveAsCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.sermon != null ? true : false;
         }
     }
 }
