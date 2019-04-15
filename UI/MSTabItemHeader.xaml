@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="MySermonsWPF.UI.MSTabItemHeader"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MySermonsWPF.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="20" d:DesignWidth="100"
+             x:Name="MSTabItemHeaderBase">
+    <Canvas Width="100"
+            Height="20"
+            Margin="0">
+        <Label  x:Name="MSTabItemHeaderText"
+                Canvas.Left="0"
+                Canvas.Top="0"
+                Width="90"
+                Height="20"
+                Padding="0"
+                Margin="0"
+                FontSize="12"
+                VerticalContentAlignment="Center"/>
+        <Label Canvas.Right="0"
+               Canvas.Top="0"
+               Width="10"
+               Height="20"
+               Padding="0"
+               Margin="0"
+               VerticalContentAlignment="Center"
+               HorizontalContentAlignment="Center">
+            <Image x:Name="MSTabItemHeaderClose"
+                   Width="10"
+                   Height="10"
+                   MouseEnter="MSTabItemHeaderClose_MouseEnter"
+                   MouseLeave="MSTabItemHeaderClose_MouseLeave"
+                   Source="pack://application:,,,/MySermonsWPF;component/UI/Resources/Close.png"/>
+        </Label>
+    </Canvas>
+</UserControl>
