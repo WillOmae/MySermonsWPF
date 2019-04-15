@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace MySermonsWPF.UI
 {
@@ -67,6 +68,27 @@ namespace MySermonsWPF.UI
         {
             if(tabItem == null) return;
             tabItem.MouseDoubleClick += (s, e) => this.Items.Remove(tabItem);
+        }
+
+        private void CloseCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            if(this.BaseTabControl.SelectedItem is TabItem tabItem)
+            {
+                this.Items.Remove(tabItem);
+            }
+        }
+        private void CloseCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.Items.Count > 0 ? true : false;
+        }
+        private void CloseAllCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            this.Items.Clear();
+            this.BaseTabControl.Items.Clear();
+        }
+        private void CloseAllCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.Items.Count > 0 ? true : false;
         }
     }
 }
