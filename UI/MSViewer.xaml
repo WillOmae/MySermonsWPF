@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="MySermonsWPF.UI.Viewer"
+﻿<UserControl x:Class="MySermonsWPF.UI.MSViewer"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -15,6 +15,7 @@
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
         <TextBlock x:Name="MSViewerTitle"
+                   x:FieldModifier="private"
                    DockPanel.Dock="Top"
                    TextAlignment="Center"
                    TextWrapping="Wrap"
@@ -23,6 +24,7 @@
                    FontWeight="Bold"
                    Padding="10"/>
         <RichTextBox x:Name="MSViewerContent"
+                     x:FieldModifier="private"
                      IsReadOnly="True"
                      Style="{DynamicResource NoBorderStyle}"/>
     </DockPanel>
