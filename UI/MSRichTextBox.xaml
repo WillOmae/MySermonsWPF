@@ -1,0 +1,263 @@
+﻿<UserControl x:Class="MySermonsWPF.UI.MSRichTextBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MySermonsWPF.UI"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+    </UserControl.Resources>
+    <DockPanel LastChildFill="True">
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <Button x:Name="RTBSave"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/save.png"/>
+            </Button>
+            <Button x:Name="RTBNew"
+                   Grid.Column="1"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/new.png"/>
+            </Button>
+            <Button x:Name="RTBPrint"
+                   Grid.Column="2"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/print.png"/>
+            </Button>
+            <Button x:Name="RTBSpell"
+                   Grid.Column="3"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/spell.png"/>
+            </Button>
+            <Button x:Name="RTBUndo"
+                   Grid.Column="4"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/undo.png"/>
+            </Button>
+            <Button x:Name="RTBRedo"
+                   Grid.Column="5"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/redo.png"/>
+            </Button>
+            <Button x:Name="RTBCut"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/cut.png"/>
+            </Button>
+            <Button x:Name="RTBCopy"
+                   Grid.Column="1"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/copy.png"/>
+            </Button>
+            <Button x:Name="RTBPaste"
+                   Grid.Column="2"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/paste.png"/>
+            </Button>
+            <Button x:Name="RTBDelete"
+                   Grid.Column="3"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/delete.png"/>
+            </Button>
+            <Button x:Name="RTBFind"
+                   Grid.Column="4"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/find.png"/>
+            </Button>
+            <!--Separator-->
+            <ComboBox x:Name="RTBFont"
+                      Grid.Column="6"
+                      Grid.ColumnSpan="4"
+                      Grid.Row="0"
+                      Grid.RowSpan="1"/>
+            <ComboBox x:Name="RTBFontSize"
+                      Grid.Column="10"
+                      Grid.ColumnSpan="2"
+                      Grid.Row="0"
+                      Grid.RowSpan="1"/>
+            <Button x:Name="RTBGrow"
+                   Grid.Column="12"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/grow.png"/>
+            </Button>
+            <Button x:Name="RTBShrink"
+                   Grid.Column="13"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/shrink.png"/>
+            </Button>
+            <Button x:Name="RTBBold"
+                   Grid.Column="6"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/bold.png"/>
+            </Button>
+            <Button x:Name="RTBItalic"
+                   Grid.Column="7"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/italic.png"/>
+            </Button>
+            <Button x:Name="RTBUnderline"
+                   Grid.Column="8"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/underline.png"/>
+            </Button>
+            <Button x:Name="RTBStrikethrough"
+                   Grid.Column="9"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/strikethrough.png"/>
+            </Button>
+            <Button x:Name="RTBSuperscript"
+                   Grid.Column="10"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/superscript.png"/>
+            </Button>
+            <Button x:Name="RTBSubscript"
+                   Grid.Column="11"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/subscript.png"/>
+            </Button>
+            <Button x:Name="RTBFontColor"
+                   Grid.Column="12"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/textcolor.png"/>
+            </Button>
+            <Button x:Name="RTBHighlight"
+                   Grid.Column="13"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/highlight.png"/>
+            </Button>
+            <!--Separator-->
+            <Button x:Name="RTBBullet"
+                   Grid.Column="14"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/bullet.png"/>
+            </Button>
+            <Button x:Name="RTBNumbering"
+                   Grid.Column="15"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/numbering.png"/>
+            </Button>
+            <Button x:Name="RTBOutdent"
+                   Grid.Column="16"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/outdent.png"/>
+            </Button>
+            <Button x:Name="RTBIndent"
+                   Grid.Column="17"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/indent.png"/>
+            </Button>
+            <Button x:Name="RTBAlignLeft"
+                   Grid.Column="14"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/alignleft.png"/>
+            </Button>
+            <Button x:Name="RTBAlignCenter"
+                   Grid.Column="15"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/aligncentre.png"/>
+            </Button>
+            <Button x:Name="RTBAlignRight"
+                   Grid.Column="16"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/alignright.png"/>
+            </Button>
+            <Button x:Name="RTBAlignJustify"
+                   Grid.Column="17"
+                   Grid.ColumnSpan="1"
+                   Grid.Row="1"
+                   Grid.RowSpan="1">
+                <Image Source="Resources/alignjustify.png"/>
+            </Button>
+        </Grid>
+        <RichTextBox>
+
+        </RichTextBox>
+    </DockPanel>
+</UserControl>
