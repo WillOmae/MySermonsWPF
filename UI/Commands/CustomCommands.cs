@@ -16,5 +16,17 @@ namespace MySermonsWPF.UI.Commands
             ownerType: typeof(CustomCommands),
             inputGestures: new InputGestureCollection() { new KeyGesture(Key.F4, ModifierKeys.Control) }
             );
+        public static readonly RoutedUICommand Find = new RoutedUICommand(
+            text: "Find",
+            name: "Find",
+            ownerType: typeof(CustomCommands),
+            inputGestures: new InputGestureCollection() { new KeyGesture(Key.F, ModifierKeys.Control) }
+            );
+        public static readonly RoutedUICommand PastePlain = new RoutedUICommand(
+            text: "Paste Plain",
+            name: "PastePlain",
+            ownerType: typeof(CustomCommands),
+            inputGestures: new InputGestureCollection() { new KeyGesture(Key.Q, ModifierKeys.Control) }
+            );
     }
 }
