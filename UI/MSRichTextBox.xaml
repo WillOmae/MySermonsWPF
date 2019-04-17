@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MySermonsWPF.UI"
+             xmlns:commands="clr-namespace:MySermonsWPF.UI.Commands"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             Loaded="MSRichTextBoxLoaded">
     <UserControl.Resources>
         <Style TargetType="Button">
             <Setter Property="Margin" Value="2"/>
@@ -14,8 +16,17 @@
             <Setter Property="Margin" Value="2"/>
         </Style>
     </UserControl.Resources>
+    <UserControl.CommandBindings>
+        <CommandBinding Command="commands:CustomCommands.Find"
+                        CanExecute="FindCommandCanExecute"
+                        Executed="FindCommandExecuted"/>
+        <CommandBinding Command="commands:CustomCommands.PastePlain"
+                        CanExecute="PastePlainCommandCanExecute"
+                        Executed="PastePlainCommandExecuted"/>
+    </UserControl.CommandBindings>
     <DockPanel LastChildFill="True">
-        <Grid DockPanel.Dock="Top">
+        <Grid x:Name="BaseFormattingBar"
+              DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="30"/>
@@ -45,7 +56,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="0"
                     Grid.RowSpan="1"
-                    ToolTip="Save changes">
+                    ToolTip="Save changes"
+                    Command="Save"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/save.png"/>
             </Button>
             <Button x:Name="RTBSaveAs"
@@ -53,7 +66,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="0"
                     Grid.RowSpan="1"
-                    ToolTip="Save as new file">
+                    ToolTip="Save as new file"
+                    Command="SaveAs"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/saveas.png"/>
             </Button>
             <Button x:Name="RTBPrint"
@@ -61,15 +76,19 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="0"
                     Grid.RowSpan="1"
-                    ToolTip="Print this document">
+                    ToolTip="Print this document"
+                    Command="Print"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/print.png"/>
             </Button>
             <Button x:Name="RTBUndo"
-                   Grid.Column="3"
-                   Grid.ColumnSpan="1"
-                   Grid.Row="0"
-                   Grid.RowSpan="1"
-                    ToolTip="Undo the last change">
+                    Grid.Column="3"
+                    Grid.ColumnSpan="1"
+                    Grid.Row="0"
+                    Grid.RowSpan="1"
+                    ToolTip="Undo the last change"
+                    Command="Undo"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/undo.png"/>
             </Button>
             <Button x:Name="RTBRedo"
@@ -77,7 +96,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="0"
                     Grid.RowSpan="1"
-                    ToolTip="Redo the last change">
+                    ToolTip="Redo the last change"
+                    Command="Redo"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/redo.png"/>
             </Button>
             <Button x:Name="RTBCut"
@@ -85,7 +106,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Cut selection">
+                    ToolTip="Cut selection"
+                    Command="Cut"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/cut.png"/>
             </Button>
             <Button x:Name="RTBCopy"
@@ -93,7 +116,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Copy selection">
+                    ToolTip="Copy selection"
+                    Command="Copy"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/copy.png"/>
             </Button>
             <Button x:Name="RTBPaste"
@@ -101,7 +126,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Paste here with formatting">
+                    ToolTip="Paste here with formatting"
+                    Command="Paste"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/paste.png"/>
             </Button>
             <Button x:Name="RTBPastePlain"
@@ -109,7 +136,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Paste here without formatting">
+                    ToolTip="Paste here without formatting"
+                    Command="commands:CustomCommands.PastePlain"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/pasteplain.png"/>
             </Button>
             <Button x:Name="RTBFind"
@@ -117,7 +146,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Search in document">
+                    ToolTip="Search in document"
+                    Command="commands:CustomCommands.Find"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/find.png"/>
             </Button>
             <!--Separator-->
@@ -138,7 +169,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="0"
                     Grid.RowSpan="1"
-                    ToolTip="Increment selection font size">
+                    ToolTip="Increment selection font size"
+                    Command="IncreaseFontSize"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/grow.png"/>
             </Button>
             <Button x:Name="RTBShrink"
@@ -146,7 +179,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="0"
                     Grid.RowSpan="1"
-                    ToolTip="Decrement font size">
+                    ToolTip="Decrement font size"
+                    Command="DecreaseFontSize"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/shrink.png"/>
             </Button>
             <Button x:Name="RTBBold"
@@ -154,7 +189,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Toggle selection bold">
+                    ToolTip="Toggle selection bold"
+                    Command="ToggleBold"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/bold.png"/>
             </Button>
             <Button x:Name="RTBItalic"
@@ -162,7 +199,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Toggle selection italic">
+                    ToolTip="Toggle selection italic"
+                    Command="ToggleItalic"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/italic.png"/>
             </Button>
             <Button x:Name="RTBUnderline"
@@ -170,7 +209,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Toggle selection underline">
+                    ToolTip="Toggle selection underline"
+                    Command="ToggleUnderline"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/underline.png"/>
             </Button>
             <Button x:Name="RTBStrikethrough"
@@ -186,7 +227,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Toggle selection superscript">
+                    ToolTip="Toggle selection superscript"
+                    Command="ToggleSuperscript"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/superscript.png"/>
             </Button>
             <Button x:Name="RTBSubscript"
@@ -194,7 +237,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Toggle selection subscript">
+                    ToolTip="Toggle selection subscript"
+                    Command="ToggleSubscript"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/subscript.png"/>
             </Button>
             <Button x:Name="RTBFontColor"
@@ -219,7 +264,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="0"
                     Grid.RowSpan="1"
-                    ToolTip="Set bulleting">
+                    ToolTip="Set bulleting"
+                    Command="ToggleBullets"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/bullets.png"/>
             </Button>
             <Button x:Name="RTBNumbering"
@@ -227,7 +274,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="0"
                     Grid.RowSpan="1"
-                    ToolTip="Set numbering">
+                    ToolTip="Set numbering"
+                    Command="ToggleNumbering"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/numbering.png"/>
             </Button>
             <Button x:Name="RTBOutdent"
@@ -235,7 +284,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="0"
                     Grid.RowSpan="1"
-                    ToolTip="Decrease indent">
+                    ToolTip="Decrease indent"
+                    Command="DecreaseIndentation"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/outdent.png"/>
             </Button>
             <Button x:Name="RTBIndent"
@@ -243,7 +294,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="0"
                     Grid.RowSpan="1"
-                    ToolTip="Increase indent">
+                    ToolTip="Increase indent"
+                    Command="IncreaseIndentation"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/indent.png"/>
             </Button>
             <Button x:Name="RTBAlignLeft"
@@ -251,7 +304,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Align selection left">
+                    ToolTip="Align selection left"
+                    Command="AlignLeft"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/alignleft.png"/>
             </Button>
             <Button x:Name="RTBAlignCenter"
@@ -259,7 +314,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Align selection centre">
+                    ToolTip="Align selection centre"
+                    Command="AlignCenter"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/aligncentre.png"/>
             </Button>
             <Button x:Name="RTBAlignRight"
@@ -267,7 +324,9 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Align selection right">
+                    ToolTip="Align selection right"
+                    Command="AlignRight"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/alignright.png"/>
             </Button>
             <Button x:Name="RTBAlignJustify"
@@ -275,11 +334,13 @@
                     Grid.ColumnSpan="1"
                     Grid.Row="1"
                     Grid.RowSpan="1"
-                    ToolTip="Justify selection">
+                    ToolTip="Justify selection"
+                    Command="AlignJustify"
+                    CommandTarget="{Binding ElementName=BaseRichTextBox}">
                 <Image Source="Resources/Formatbar/alignjustify.png"/>
             </Button>
         </Grid>
-        <RichTextBox>
+        <RichTextBox x:Name="BaseRichTextBox">
 
         </RichTextBox>
     </DockPanel>
