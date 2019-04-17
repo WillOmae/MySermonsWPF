@@ -32,7 +32,7 @@
                    Height="10"
                    MouseEnter="MSTabItemHeaderClose_MouseEnter"
                    MouseLeave="MSTabItemHeaderClose_MouseLeave"
-                   Source="pack://application:,,,/MySermonsWPF;component/UI/Resources/Close.png"/>
+                   Source="Resources/Close.png"/>
         </Label>
     </Canvas>
 </UserControl>
