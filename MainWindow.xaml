@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MySermonsWPF"
+        xmlns:custom="clr-namespace:MySermonsWPF.UI"
         mc:Ignorable="d"
         Title="MySermons" Height="450" Width="800">
     <Window.Resources>
@@ -60,12 +61,12 @@
                       Style="{StaticResource MajorControlStyle}">
 
             </TreeView>
-            <TabControl x:Name="MSTabControl"
-                        Grid.Column="1"
-                        Grid.ColumnSpan="1"
-                        Style="{StaticResource MajorControlStyle}">
+            <custom:MSTabControl x:Name="MSTabControl"
+                                 Grid.Column="1"
+                                 Grid.ColumnSpan="1"
+                                 Style="{StaticResource MajorControlStyle}">
 
-            </TabControl>
+            </custom:MSTabControl>
         </Grid>
     </DockPanel>
 </Window>
