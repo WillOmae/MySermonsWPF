@@ -210,6 +210,7 @@
     <Compile Include="UI\MSDocumentManager.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="UI\MSFindVisualChildren.cs" />
     <Compile Include="UI\MSPrinter.cs">
       <SubType>Code</SubType>
     </Compile>
