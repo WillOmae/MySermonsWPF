@@ -23,7 +23,6 @@ namespace MySermonsWPF.UI
         private void MSRichTextBoxLoaded(object sender, RoutedEventArgs e)
         {
             this.SetButtonsProperties();
-            MessageBox.Show(this.RTBPastePlain.Background.ToString());
         }
         /// <summary>
         /// Set the properties of buttons in bulk.
