@@ -16,11 +16,15 @@ namespace MySermonsWPF.UI
         /// The RichTextBox control to be managed.
         /// </summary>
         private readonly RichTextBox rtb;
+
         /// <summary>
         /// Default constructor.
         /// </summary>
         /// <param name="richTextBox">The RichTextBox control to be managed.</param>
-        public MSDocumentManager(RichTextBox richTextBox) => this.rtb = richTextBox;
+        public MSDocumentManager(RichTextBox richTextBox)
+        {
+            this.rtb = richTextBox;
+        }
 
         /// <summary>
         /// Convert the RichTextBox text into rich text in a specified format (currently rtf).
@@ -49,6 +53,7 @@ namespace MySermonsWPF.UI
                 return string.Empty;
             }
         }
+
         /// <summary>
         /// Sets the RichTextBox text from rich text in a specified format (currently rtf).
         /// </summary>
@@ -64,6 +69,35 @@ namespace MySermonsWPF.UI
                 }
             }
         }
+
+        /// <summary>
+        /// Checks whether content is empty.
+        /// </summary>
+        /// <returns>Is content empty?</returns>
+        public bool IsEmpty()
+        {
+            // check whether content is null, empty or whitespace
+            if(this.rtb != null)
+            {
+                var content = new TextRange(this.rtb.Document.ContentStart, this.rtb.Document.ContentEnd).Text;
+                return string.IsNullOrEmpty(content) || string.IsNullOrWhiteSpace(content);
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Insert text at the caret position.
+        /// </summary>
+        /// <param name="text">Text to insert.</param>
+        public void Insert(string text)
+        {
+            // insert plain text from the clipboard to the caret position
+            this.rtb.CaretPosition.InsertTextInRun(text);
+        }
+
         /// <summary>
         /// Set the position of the stream to the beginning.
         /// </summary>
