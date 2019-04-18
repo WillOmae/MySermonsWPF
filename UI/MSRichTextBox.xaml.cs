@@ -1,6 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using MySermonsWPF.Data;
 
@@ -14,7 +15,9 @@ namespace MySermonsWPF.UI
         /// <summary>
         /// Sermon that is to be manipulated internally.
         /// </summary>
-        private Sermon sermon;
+        private Sermon sermon = null;
+        private MSDocumentManager documentManager = null;
+
         /// <summary>
         /// Constructor accepting a parameter of type sermon.
         /// </summary>
@@ -24,6 +27,7 @@ namespace MySermonsWPF.UI
             this.InitializeComponent();
             this.sermon = sermon;
         }
+
         /// <summary>
         /// Event handler when all controls have been loaded.
         /// </summary>
@@ -31,8 +35,10 @@ namespace MySermonsWPF.UI
         /// <param name="e"></param>
         private void MSRichTextBoxLoaded(object sender, RoutedEventArgs e)
         {
+            this.documentManager = new MSDocumentManager(this.BaseRichTextBox);
             this.SetButtonsProperties();
         }
+
         /// <summary>
         /// Set the properties of buttons in bulk.
         /// </summary>
@@ -46,34 +52,80 @@ namespace MySermonsWPF.UI
             }
         }
 
+        private void SaveCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("saving...");
+        }
+
+        private void SaveCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // you can search for text when there is text, right?
+            e.CanExecute = this.documentManager != null ? !this.documentManager.IsEmpty() : false;
+        }
+
+        private void SaveAsCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("saving as...");
+        }
+
+        private void SaveAsCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.documentManager != null ? !this.documentManager.IsEmpty() : false;
+        }
+
+        private void PrintCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("printing...");
+        }
+
+        private void PrintCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.documentManager != null ? !this.documentManager.IsEmpty() : false;
+        }
+
         private void FindCommandExecuted(object target, ExecutedRoutedEventArgs e)
         {
             MessageBox.Show("finding...");
         }
+
         private void FindCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // you can search for text when there is text, right?
-            e.CanExecute = !this.IsRTBEmpty();
+            e.CanExecute = this.documentManager != null ? !this.documentManager.IsEmpty() : false;
         }
+
         private void PastePlainCommandExecuted(object target, ExecutedRoutedEventArgs e)
         {
-            // insert plain text from the clipboard to the caret position
-            this.BaseRichTextBox.CaretPosition.InsertTextInRun(Clipboard.GetText());
+            this.documentManager.Insert(Clipboard.GetText());
         }
+
         private void PastePlainCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = Clipboard.ContainsText();
+            e.CanExecute = this.documentManager != null && Clipboard.ContainsText();
         }
-        /// <summary>
-        /// Checks whether rtb is empty.
-        /// </summary>
-        /// <returns>Is rtb empty?</returns>
-        private bool IsRTBEmpty()
+
+        private void Save()
         {
-            // check whether content is null, empty or whitespace
-            return this.BaseRichTextBox != null
-                ? string.IsNullOrEmpty(new TextRange(this.BaseRichTextBox.Document.ContentStart, this.BaseRichTextBox.Document.ContentEnd).Text) || string.IsNullOrWhiteSpace(new TextRange(this.BaseRichTextBox.Document.ContentStart, this.BaseRichTextBox.Document.ContentEnd).Text)
-                : true;
+            Location location = new Location("Juja", StringType.Name);
+            List<Theme> themes = new List<Theme>()
+            {
+                new Theme("salvation",StringType.Name),
+                new Theme("history",StringType.Name),
+                new Theme("faith",StringType.Name),
+                new Theme("eschatology",StringType.Name),
+                new Theme("hermeneutics",StringType.Name),
+                new Theme("sanctuary",StringType.Name)
+            };
+            var content = this.documentManager.GetRichText();
+            var title = "New Sermon: " + DateTime.Now.ToShortTimeString();
+            var keyText = "Gal 3:24";
+            if(this.sermon == null)
+            {
+                this.sermon = new Sermon(title, location, themes, keyText, string.Empty, content);
+            }
+            else
+            {
+            }
         }
     }
 }

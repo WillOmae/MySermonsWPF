@@ -6,7 +6,11 @@
         xmlns:local="clr-namespace:MySermonsWPF"
         xmlns:custom="clr-namespace:MySermonsWPF.UI"
         mc:Ignorable="d"
-        Title="MySermons" Height="450" Width="800">
+        Title="MySermons"
+        Height="450"
+        Width="800"
+        MinHeight="300"
+        MinWidth="720">
     <Window.Resources>
         <Style x:Key="MajorControlStyle" TargetType="Control">
             <Setter Property="Margin" Value="0"/>
@@ -50,23 +54,15 @@
                 Ready!
             </TextBlock>
         </StatusBar>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="4*"/>
-            </Grid.ColumnDefinitions>
-            <TreeView x:Name="MSTreeview"
-                      Grid.Column="0"
-                      Grid.ColumnSpan="1"
-                      Style="{StaticResource MajorControlStyle}">
+        <TreeView x:Name="MSTreeview"
+                  DockPanel.Dock="Left"
+                  Width="150"
+                  Style="{StaticResource MajorControlStyle}">
 
-            </TreeView>
-            <custom:MSTabControl x:Name="MSTabControl"
-                                 Grid.Column="1"
-                                 Grid.ColumnSpan="1"
-                                 Style="{StaticResource MajorControlStyle}">
+        </TreeView>
+        <custom:MSTabControl x:Name="MSTabControl"
+                             Style="{StaticResource MajorControlStyle}">
 
-            </custom:MSTabControl>
-        </Grid>
+        </custom:MSTabControl>
     </DockPanel>
 </Window>
