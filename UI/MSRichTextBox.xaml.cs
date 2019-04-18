@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using MySermonsWPF.Data;
 
 namespace MySermonsWPF.UI
@@ -11,15 +11,24 @@ namespace MySermonsWPF.UI
     /// </summary>
     public partial class MSRichTextBox:UserControl
     {
-        private SolidColorBrush white = new SolidColorBrush(Color.FromRgb(0xFF, 0xFF, 0xFF));
-        private SolidColorBrush grey = new SolidColorBrush(Color.FromArgb(0xFF, 0xDD, 0xDD, 0xDD));
+        /// <summary>
+        /// Sermon that is to be manipulated internally.
+        /// </summary>
         private Sermon sermon;
+        /// <summary>
+        /// Constructor accepting a parameter of type sermon.
+        /// </summary>
+        /// <param name="sermon">The sermon object to be manipulated.</param>
         public MSRichTextBox(Sermon sermon)
         {
             this.InitializeComponent();
             this.sermon = sermon;
         }
-
+        /// <summary>
+        /// Event handler when all controls have been loaded.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MSRichTextBoxLoaded(object sender, RoutedEventArgs e)
         {
             this.SetButtonsProperties();
@@ -32,17 +41,9 @@ namespace MySermonsWPF.UI
             // first, get the buttons.
             foreach(var button in MSFindVisualChildren.FindVisualChildren<Button>(this.BaseFormattingBar))
             {
-                button.IsEnabledChanged += this.Button_IsEnabledChanged;
-                button.Click += delegate
-                {
-                    this.BaseRichTextBox.Focus();
-                };
+                // prevent buttons from retaining focus; always pass focus back to the rtb;
+                button.Click += (sender, eventArgs) => this.BaseRichTextBox.Focus();
             }
-        }
-
-        private void Button_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            ((Button)sender).Background = (bool)e.NewValue ? this.white : this.grey;
         }
 
         private void FindCommandExecuted(object target, ExecutedRoutedEventArgs e)
@@ -51,15 +52,28 @@ namespace MySermonsWPF.UI
         }
         private void FindCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            // you can search for text when there is text, right?
+            e.CanExecute = !this.IsRTBEmpty();
         }
         private void PastePlainCommandExecuted(object target, ExecutedRoutedEventArgs e)
         {
-            MessageBox.Show("pasting plain...");
+            // insert plain text from the clipboard to the caret position
+            this.BaseRichTextBox.CaretPosition.InsertTextInRun(Clipboard.GetText());
         }
         private void PastePlainCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            e.CanExecute = Clipboard.ContainsText();
+        }
+        /// <summary>
+        /// Checks whether rtb is empty.
+        /// </summary>
+        /// <returns>Is rtb empty?</returns>
+        private bool IsRTBEmpty()
+        {
+            // check whether content is null, empty or whitespace
+            return this.BaseRichTextBox != null
+                ? string.IsNullOrEmpty(new TextRange(this.BaseRichTextBox.Document.ContentStart, this.BaseRichTextBox.Document.ContentEnd).Text) || string.IsNullOrWhiteSpace(new TextRange(this.BaseRichTextBox.Document.ContentStart, this.BaseRichTextBox.Document.ContentEnd).Text)
+                : true;
         }
     }
 }
