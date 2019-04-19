@@ -12,7 +12,14 @@ namespace MySermonsWPF.Data
         /// <summary>
         /// The autoincremented integer ID.
         /// </summary>
-        public long ID => this.id;
+        public long ID
+        {
+            get
+            {
+                return this.id;
+            }
+        }
+
         /// <summary>
         /// The uniquely generated Guid string.
         /// </summary>
@@ -224,6 +231,7 @@ namespace MySermonsWPF.Data
         {
 
         }
+
         /// <summary>
         /// Build sermon from ID.
         /// </summary>
@@ -233,6 +241,7 @@ namespace MySermonsWPF.Data
             Sermon sermon = Read(id);
             this.CommonInit(sermon.ID, sermon.GUID, sermon.Title, sermon.Location.ID, sermon.Location.Name, sermon.Location, sermon.Themes, sermon.DateCreated.Ticks, sermon.DateLastAccessed.Ticks, sermon.KeyVerse, sermon.OtherMetaData, sermon.Content);
         }
+        
         /// <summary>
         /// Build sermon from GUID.
         /// </summary>
@@ -242,6 +251,7 @@ namespace MySermonsWPF.Data
             Sermon sermon = Read(guid);
             this.CommonInit(sermon.ID, sermon.GUID, sermon.Title, sermon.Location.ID, sermon.Location.Name, sermon.Location, sermon.Themes, sermon.DateCreated.Ticks, sermon.DateLastAccessed.Ticks, sermon.KeyVerse, sermon.OtherMetaData, sermon.Content);
         }
+
         /// <summary>
         /// Build sermon from minimal parameters.
         /// </summary>
@@ -250,7 +260,11 @@ namespace MySermonsWPF.Data
         /// <param name="keyVerse">The key verse of the sermon.</param>
         /// <param name="otherMetadata">Other metadata.</param>
         /// <param name="content">The content of the sermon.</param>
-        public Sermon(string title, Location location, List<Theme> themes, string keyVerse, string otherMetadata, string content) => this.CommonInit(-1, Guid.NewGuid().ToString(), title, location.ID, location.Name, location, themes, DateTime.Now.Ticks, DateTime.Now.Ticks, keyVerse, otherMetadata, content);
+        public Sermon(string title, Location location, List<Theme> themes, string keyVerse, string otherMetadata, string content)
+        {
+            this.CommonInit(-1, Guid.NewGuid().ToString(), title, location.ID, location.Name, location, themes, DateTime.Now.Ticks, DateTime.Now.Ticks, keyVerse, otherMetadata, content);
+        }
+
         /// <summary>
         /// Build sermon from all parameters.
         /// </summary>
@@ -265,7 +279,11 @@ namespace MySermonsWPF.Data
         /// <param name="keyVerse">The key verse of the sermon.</param>
         /// <param name="otherMetadata">Other metadata.</param>
         /// <param name="content">The content of the sermon.</param>
-        public Sermon(long id, string guid, string title, long locationId, string locationName, Location location, List<Theme> themes, long dateCreated, long lastAccessed, string keyVerse, string otherMetadata, string content) => this.CommonInit(id, guid, title, locationId, locationName, location, themes, dateCreated, lastAccessed, keyVerse, otherMetadata, content);
+        public Sermon(long id, string guid, string title, long locationId, string locationName, Location location, List<Theme> themes, long dateCreated, long lastAccessed, string keyVerse, string otherMetadata, string content)
+        {
+            this.CommonInit(id, guid, title, locationId, locationName, location, themes, dateCreated, lastAccessed, keyVerse, otherMetadata, content);
+        }
+
         /// <summary>
         /// Called by all constructors to prevent duplication of code.
         /// </summary>
@@ -314,6 +332,7 @@ namespace MySermonsWPF.Data
                 return false;
             }
         }
+        
         /// <summary>
         /// Update the sermon in the database.
         /// </summary>
@@ -332,6 +351,7 @@ namespace MySermonsWPF.Data
                 return false;
             }
         }
+        
         /// <summary>
         /// Delete the sermon from the database.
         /// </summary>
@@ -349,6 +369,7 @@ namespace MySermonsWPF.Data
                 return false;
             }
         }
+        
         /// <summary>
         /// Select by ID.
         /// </summary>
@@ -369,6 +390,7 @@ namespace MySermonsWPF.Data
                 return null;
             }
         }
+        
         /// <summary>
         /// Select by GUID.
         /// </summary>
@@ -389,6 +411,7 @@ namespace MySermonsWPF.Data
                 return null;
             }
         }
+        
         /// <summary>
         /// Selects all sermons.
         /// </summary>
@@ -398,6 +421,7 @@ namespace MySermonsWPF.Data
             List<Dictionary<string, object>> reader = Database.Read(SELECT_STATEMENT);
             return BuildFromReader(reader);
         }
+        
         /// <summary>
         /// Builds a list of sermons from a more generic list returned by the database class.
         /// </summary>
@@ -445,7 +469,11 @@ namespace MySermonsWPF.Data
         /// <param name="filter">The filter to be used.</param>
         /// <param name="sermons">List of sermons to be sorted.</param>
         /// <returns>List of sorted sermons or null.</returns>
-        public static List<SortedSermons> Sort(SermonFilters filter, List<Sermon> sermons) => sermons == null ? null : SortActuator(filter, sermons);
+        public static List<SortedSermons> Sort(SermonFilters filter, List<Sermon> sermons)
+        {
+            return sermons == null ? null : SortActuator(filter, sermons);
+        }
+
         /// <summary>
         /// Does the actual sorting.
         /// </summary>
@@ -506,6 +534,7 @@ namespace MySermonsWPF.Data
             }
             return sortedSermons.Count > 0 ? sortedSermons : null;
         }
+        
         /// <summary>
         /// Creates a <see cref="SortedSermons"/> object and adds it to the <paramref name="list"/>.
         /// </summary>
