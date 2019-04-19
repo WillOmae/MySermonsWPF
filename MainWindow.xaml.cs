@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using MySermonsWPF.Data;
 using MySermonsWPF.UI;
 
 namespace MySermonsWPF
@@ -11,12 +12,19 @@ namespace MySermonsWPF
     {
         public MainWindow()
         {
-            this.InitializeComponent();
-            this.MSTabControl.Items.Add(new TabItem()
+            if(Database.Initialise())
             {
-                Header = "New document",
-                Content = new MSRichTextBox(null)
-            });
+                this.InitializeComponent();
+                this.MSTabControl.Items.Add(new TabItem()
+                {
+                    Header = "New document",
+                    Content = new MSRichTextBox(null)
+                });
+            }
+            else
+            {
+                MessageBox.Show("Database initialisation failed.");
+            }
         }
     }
 }
