@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using MySermonsWPF.Data;
 
@@ -37,6 +38,8 @@ namespace MySermonsWPF.UI
         {
             this.documentManager = new MSDocumentManager(this.BaseRichTextBox);
             this.SetButtonsProperties();
+            this.RTBFontSize.ItemsSource = new double[] { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72 };
+            this.RTBFontSize.SelectedItem = 12D;
         }
 
         /// <summary>
@@ -133,6 +136,15 @@ namespace MySermonsWPF.UI
                 this.sermon = new Sermon(id, guid, title, location.ID, location.Name, location, themes, this.sermon.DateCreated.Ticks, this.sermon.DateLastAccessed.Ticks, keyText, this.sermon.OtherMetaData, content);
                 MessageBox.Show("Update successful: " + this.sermon.Update());
             }
+        }
+
+        private void RTBFontSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach(double item in e.AddedItems)
+            {
+                this.BaseRichTextBox.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, item);
+            }
+            BaseRichTextBox.Focus();
         }
     }
 }
