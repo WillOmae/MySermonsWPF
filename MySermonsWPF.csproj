@@ -69,6 +69,8 @@
   <ItemGroup>
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
+    <Resource Include="UI\Resources\Formatbar\close2.png" />
+    <Resource Include="UI\Resources\Formatbar\open.png" />
     <Resource Include="UI\Resources\Formatbar\aligncentre.png" />
     <Resource Include="UI\Resources\Formatbar\alignjustify.png" />
     <Resource Include="UI\Resources\Formatbar\alignleft.png" />

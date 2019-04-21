@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using MySermonsWPF.Data;
 
 namespace MySermonsWPF.UI
@@ -18,6 +19,8 @@ namespace MySermonsWPF.UI
         /// </summary>
         private Sermon sermon = null;
         private MSDocumentManager documentManager = null;
+        private BitmapImage closeIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/Formatbar/close2.png"));
+        private BitmapImage openIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/Formatbar/open.png"));
 
         /// <summary>
         /// Constructor accepting a parameter of type sermon.
@@ -62,18 +65,28 @@ namespace MySermonsWPF.UI
 
         private void SaveCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // you can search for text when there is text, right?
+            // you can save text when there is text, right?
             e.CanExecute = this.documentManager != null ? !this.documentManager.IsEmpty() : false;
         }
 
-        private void SaveAsCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        private void OpenCommandExecuted(object target, ExecutedRoutedEventArgs e)
         {
-            MessageBox.Show("saving as...");
+            switch(this.MetadataPanel.Visibility)
+            {
+                case Visibility.Collapsed:
+                    this.MetadataPanel.Visibility = Visibility.Visible;
+                    this.RTBMetadataIcon.Source = this.closeIcon;
+                    break;
+                case Visibility.Visible:
+                    this.MetadataPanel.Visibility = Visibility.Collapsed;
+                    this.RTBMetadataIcon.Source = this.openIcon;
+                    break;
+            }
         }
 
-        private void SaveAsCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void OpenCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.documentManager != null ? !this.documentManager.IsEmpty() : false;
+            e.CanExecute = true;
         }
 
         private void PrintCommandExecuted(object target, ExecutedRoutedEventArgs e)
@@ -109,42 +122,43 @@ namespace MySermonsWPF.UI
 
         private void Save()
         {
-            Location location = new Location("Juja", StringType.Name);
-            List<Theme> themes = new List<Theme>()
+            if(string.IsNullOrEmpty(this.MetaTitle.Text))
             {
-                new Theme("salvation",StringType.Name),
-                new Theme("history",StringType.Name),
-                new Theme("faith",StringType.Name),
-                new Theme("eschatology",StringType.Name),
-                new Theme("hermeneutics",StringType.Name),
-                new Theme("sanctuary",StringType.Name)
-            };
-            var content = this.documentManager.GetRichText();
-            var title = "New Sermon: " + DateTime.Now.ToShortTimeString();
-            var keyText = "Gal 3:24";
-            if(this.sermon == null)
-            {
-                // the sermon does not exist; create
-                this.sermon = new Sermon(title, location, themes, keyText, string.Empty, content);
-                MessageBox.Show("Creation success: " + this.sermon.Create());
+                MessageBox.Show("Specify sermon title", "Title not set", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                this.MetadataPanel.Visibility = Visibility.Visible;
+                this.RTBMetadataIcon.Source = this.closeIcon;
             }
             else
             {
-                // the sermon exists; update
-                var id = this.sermon.ID;
-                var guid = this.sermon.GUID;
-                this.sermon = new Sermon(id, guid, title, location.ID, location.Name, location, themes, this.sermon.DateCreated.Ticks, this.sermon.DateLastAccessed.Ticks, keyText, this.sermon.OtherMetaData, content);
-                MessageBox.Show("Update successful: " + this.sermon.Update());
+                Location location = string.IsNullOrEmpty(this.MetaLocation.Text) ? null : new Location(this.MetaLocation.Text, StringType.Name);
+                List<Theme> themes = string.IsNullOrEmpty(this.MetaThemes.Text) ? null : new List<Theme>() { new Theme(this.MetaThemes.Text, StringType.Name) };
+                string content = this.documentManager.GetRichText();
+                string title = this.MetaTitle.Text;
+                string keyText = string.IsNullOrEmpty(this.MetaKeyText.Text) ? null : this.MetaKeyText.Text;
+                string otherMetadata = string.IsNullOrEmpty(this.MetaOtherInfo.Text) ? null : this.MetaOtherInfo.Text;
+                if(this.sermon == null)
+                {
+                    // the sermon does not exist; create
+                    this.sermon = new Sermon(title, location, themes, keyText, otherMetadata, content);
+                    MessageBox.Show("Creation success: " + this.sermon.Create());
+                }
+                else
+                {
+                    // the sermon exists; update
+                    var id = this.sermon.ID;
+                    var guid = this.sermon.GUID;
+                    this.sermon = new Sermon(id, guid, title, location.ID, location.Name, location, themes, this.sermon.DateCreated.Ticks, lastAccessed: DateTime.Now.Ticks, keyVerse: keyText, otherMetadata: otherMetadata, content: content);
+                    MessageBox.Show("Update successful: " + this.sermon.Update());
+                }
             }
         }
-
         private void RTBFontSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             foreach(double item in e.AddedItems)
             {
                 this.BaseRichTextBox.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, item);
             }
-            BaseRichTextBox.Focus();
+            this.BaseRichTextBox.Focus();
         }
     }
 }
