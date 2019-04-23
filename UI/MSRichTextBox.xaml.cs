@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using MySermonsWPF.Data;
 
@@ -43,6 +44,7 @@ namespace MySermonsWPF.UI
             this.SetButtonsProperties();
             this.RTBFontSize.ItemsSource = new double[] { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72 };
             this.RTBFontSize.SelectedItem = 12D;
+            this.RTBFont.SelectedItem = new FontFamily("Arial");
         }
 
         /// <summary>
@@ -55,6 +57,12 @@ namespace MySermonsWPF.UI
             {
                 // prevent buttons from retaining focus; always pass focus back to the rtb;
                 button.Click += (sender, eventArgs) => this.BaseRichTextBox.Focus();
+            }
+            // first, get the comboboxes
+            foreach(var comboBox in MSFindVisualChildren.FindVisualChildren<ComboBox>(this.BaseFormattingBar))
+            {
+                // prevent comboboxes from retaining focus; always pass focus back to the rtb;
+                comboBox.SelectionChanged += (sender, eventArgs) => this.BaseRichTextBox.Focus();
             }
         }
 
@@ -120,6 +128,24 @@ namespace MySermonsWPF.UI
             e.CanExecute = this.documentManager != null && Clipboard.ContainsText();
         }
 
+        private void RTBFontSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach(double item in e.AddedItems)
+            {
+                // apply the font size selected
+                this.BaseRichTextBox.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, item);
+            }
+        }
+
+        private void RTBFont_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach(FontFamily item in e.AddedItems)
+            {
+                // apply the font selected
+                this.BaseRichTextBox.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, item.Source);
+            }
+        }
+
         private void Save()
         {
             if(string.IsNullOrEmpty(this.MetaTitle.Text))
@@ -132,8 +158,8 @@ namespace MySermonsWPF.UI
             {
                 Location location = string.IsNullOrEmpty(this.MetaLocation.Text) ? null : new Location(this.MetaLocation.Text, StringType.Name);
                 List<Theme> themes = string.IsNullOrEmpty(this.MetaThemes.Text) ? null : new List<Theme>() { new Theme(this.MetaThemes.Text, StringType.Name) };
-                string content = this.documentManager.GetRichText();
-                string title = this.MetaTitle.Text;
+                string content = this.documentManager.IsEmpty() ? null : this.documentManager.GetRichText();
+                string title = string.IsNullOrEmpty(this.MetaTitle.Text) ? null : this.MetaTitle.Text;
                 string keyText = string.IsNullOrEmpty(this.MetaKeyText.Text) ? null : this.MetaKeyText.Text;
                 string otherMetadata = string.IsNullOrEmpty(this.MetaOtherInfo.Text) ? null : this.MetaOtherInfo.Text;
                 if(this.sermon == null)
@@ -147,18 +173,12 @@ namespace MySermonsWPF.UI
                     // the sermon exists; update
                     var id = this.sermon.ID;
                     var guid = this.sermon.GUID;
-                    this.sermon = new Sermon(id, guid, title, location.ID, location.Name, location, themes, this.sermon.DateCreated.Ticks, lastAccessed: DateTime.Now.Ticks, keyVerse: keyText, otherMetadata: otherMetadata, content: content);
+                    var dateCreated = this.sermon.DateCreated.Ticks;
+                    var lastAccessed = DateTime.Now.Ticks;
+                    this.sermon = new Sermon(id, guid, title, location.ID, location.Name, location, themes, dateCreated, lastAccessed, keyText, otherMetadata, content);
                     MessageBox.Show("Update successful: " + this.sermon.Update());
                 }
             }
-        }
-        private void RTBFontSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            foreach(double item in e.AddedItems)
-            {
-                this.BaseRichTextBox.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, item);
-            }
-            this.BaseRichTextBox.Focus();
         }
     }
 }
