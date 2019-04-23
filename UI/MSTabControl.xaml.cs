@@ -90,5 +90,9 @@ namespace MySermonsWPF.UI
         {
             e.CanExecute = this.Items.Count > 0 ? true : false;
         }
+        public void SetSelectedItem(TabItem tabItem)
+        {
+            BaseTabControl.SelectedItem = tabItem;
+        }
     }
 }
