@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MySermonsWPF"
+        xmlns:data="clr-namespace:MySermonsWPF.Data"
         xmlns:custom="clr-namespace:MySermonsWPF.UI"
         mc:Ignorable="d"
         Title="MySermons"
@@ -57,8 +58,19 @@
         <TreeView x:Name="MSTreeview"
                   DockPanel.Dock="Left"
                   Width="150"
+                  ItemsSource="{x:Static local:MainWindow.Sermons}"
                   Style="{StaticResource MajorControlStyle}">
-
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type data:SortedSermons}"
+                                          ItemsSource="{Binding Path=Children}">
+                    <TextBlock Text="{Binding Path=Parent}"/>
+                    <HierarchicalDataTemplate.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Title}"/>
+                        </DataTemplate>
+                    </HierarchicalDataTemplate.ItemTemplate>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
         </TreeView>
         <custom:MSTabControl x:Name="MSTabControl"
                              Style="{StaticResource MajorControlStyle}">
