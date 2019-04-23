@@ -317,10 +317,16 @@
                       Grid.Row="0"
                       Grid.RowSpan="1"
                       ToolTip="Set selection font"
+                      HorizontalContentAlignment="Left"
+                      VerticalContentAlignment="Center"
+                      SelectionChanged="RTBFont_SelectionChanged"
                       ItemsSource="{Binding Source={x:Static Fonts.SystemFontFamilies}}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding}" FontFamily="{Binding}"/>
+                        <TextBlock Text="{Binding}"
+                                   FontFamily="{Binding}"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Center"/>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
@@ -330,8 +336,9 @@
                       Grid.Row="0"
                       Grid.RowSpan="1"
                       ToolTip="Set selection font size"
-                      SelectionChanged="RTBFontSize_SelectionChanged"
-                      SelectedItem="{Binding CurrentFontSize}"/>
+                      HorizontalContentAlignment="Center"
+                      VerticalContentAlignment="Center"
+                      SelectionChanged="RTBFontSize_SelectionChanged"/>
             <Button x:Name="RTBGrow"
                     Grid.Column="12"
                     Grid.ColumnSpan="1"
