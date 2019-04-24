@@ -17,6 +17,18 @@
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="0"/>
         </Style>
+        <ContextMenu x:Key="ParentContextMenu">
+            <MenuItem Header="View all" Click="ViewAllTreeViewContextMenu_Click"/>
+            <MenuItem Header="Edit all" Click="EditAllTreeViewContextMenu_Click"/>
+            <MenuItem Header="Print all" Click="PrintAllTreeViewContextMenu_Click"/>
+            <MenuItem Header="Delete all" Click="DeleteAllTreeViewContextMenu_Click"/>
+        </ContextMenu>
+        <ContextMenu x:Key="ChildContextMenu">
+            <MenuItem Header="View" Click="ViewTreeViewContextMenu_Click"/>
+            <MenuItem Header="Edit" Click="EditTreeViewContextMenu_Click"/>
+            <MenuItem Header="Print" Click="PrintTreeViewContextMenu_Click"/>
+            <MenuItem Header="Delete" Click="DeleteTreeViewContextMenu_Click"/>
+        </ContextMenu>
     </Window.Resources>
     <DockPanel LastChildFill="True">
         <Menu x:Name="BaseMenuBar"
@@ -59,16 +71,20 @@
                   DockPanel.Dock="Left"
                   Width="150"
                   ItemsSource="{x:Static local:MainWindow.Sermons}"
-                  Style="{StaticResource MajorControlStyle}">
+                  Style="{StaticResource MajorControlStyle}"
+                  ContextMenu="{StaticResource ParentContextMenu}">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type data:SortedSermons}"
                                           ItemsSource="{Binding Path=Children}">
-                    <TextBlock Text="{Binding Path=Parent}"/>
+                    <TextBlock Text="{Binding Path=Parent}"
+                               Tag="{Binding Path=Parent}"
+                               ContextMenu="{StaticResource ParentContextMenu}"/>
                     <HierarchicalDataTemplate.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=Title}"
                                        Tag="{Binding Path=GUID}"
-                                       MouseDown="TreeViewEntry_MouseDown"/>
+                                       MouseDown="TreeViewEntry_MouseDown"
+                                       ContextMenu="{StaticResource ChildContextMenu}"/>
                         </DataTemplate>
                     </HierarchicalDataTemplate.ItemTemplate>
                 </HierarchicalDataTemplate>
