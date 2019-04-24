@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using MySermonsWPF.Data;
 using MySermonsWPF.UI;
 
@@ -34,25 +35,33 @@ namespace MySermonsWPF
             }
         }
 
-        private void TreeViewEntry_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void TreeViewEntry_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if(e.ClickCount == 2 && (sender is TextBlock textBlock))
+            if(e.ChangedButton == MouseButton.Left && e.ClickCount == 2 && (sender is TextBlock textBlock))
             {
-                string guid = textBlock.Tag.ToString();
-                var sermon = (from x in Sermons
-                              from y in x.Children
-                              where y.GUID.Equals(guid)
-                              select y).FirstOrDefault();
-                if(sermon != null)
+                this.ViewSermonByGuid(textBlock.Tag.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Get and display sermon based on a GUID.
+        /// </summary>
+        /// <param name="guid">The string representation of the GUID.</param>
+        private void ViewSermonByGuid(string guid)
+        {
+            var sermon = (from x in Sermons
+                          from y in x.Children
+                          where y.GUID.Equals(guid)
+                          select y).FirstOrDefault();
+            if(sermon != null)
+            {
+                TabItem tabItem = new TabItem()
                 {
-                    TabItem tabItem = new TabItem()
-                    {
-                        Header = sermon.Title,
-                        Content = new MSViewer(sermon)
-                    };
-                    this.MSTabControl.Items.Add(tabItem);
-                    this.MSTabControl.SetSelectedItem(tabItem);
-                }
+                    Header = sermon.Title,
+                    Content = new MSViewer(sermon)
+                };
+                this.MSTabControl.Items.Add(tabItem);
+                this.MSTabControl.SetSelectedItem(tabItem);
             }
         }
     }
