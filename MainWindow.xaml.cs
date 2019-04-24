@@ -23,7 +23,7 @@ namespace MySermonsWPF
                 Sermons = Sermon.Sort(SermonFilters.Location, _sermons);
 
                 this.InitializeComponent();
-                this.MSTabControl.Items.Add(new TabItem()
+                this.BaseTabControl.Items.Add(new TabItem()
                 {
                     Header = "New document",
                     Content = new MSRichTextBox(null)
@@ -60,8 +60,8 @@ namespace MySermonsWPF
                     Header = sermon.Title,
                     Content = new MSViewer(sermon)
                 };
-                this.MSTabControl.Items.Add(tabItem);
-                this.MSTabControl.SetSelectedItem(tabItem);
+                this.BaseTabControl.Items.Add(tabItem);
+                this.BaseTabControl.SetSelectedItem(tabItem);
             }
         }
     }

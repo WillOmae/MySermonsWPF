@@ -14,7 +14,7 @@ namespace MySermonsWPF.UI
             this.InitializeComponent();
         }
 
-        private void MSTabItemHeaderClose_MouseEnter(object sender, MouseEventArgs e)
+        private void BaseTabItemHeaderClose_MouseEnter(object sender, MouseEventArgs e)
         {
             if(sender is Image image)
             {
@@ -22,7 +22,7 @@ namespace MySermonsWPF.UI
             }
         }
 
-        private void MSTabItemHeaderClose_MouseLeave(object sender, MouseEventArgs e)
+        private void BaseTabItemHeaderClose_MouseLeave(object sender, MouseEventArgs e)
         {
             if(sender is Image image)
             {

@@ -22,11 +22,11 @@ namespace MySermonsWPF.UI
         {
             get
             {
-                return this.MSViewerTitle.Text;
+                return this.BaseViewerTitle.Text;
             }
             private set
             {
-                this.MSViewerTitle.Text = value;
+                this.BaseViewerTitle.Text = value;
             }
         }
         /// <summary>
@@ -50,7 +50,7 @@ namespace MySermonsWPF.UI
         public MSViewer(Sermon sermon) : base()
         {
             this.InitializeComponent();
-            this.documentManager = new MSDocumentManager(this.MSViewerContent);
+            this.documentManager = new MSDocumentManager(this.BaseViewerContent);
             this.sermon = sermon;
             if(sermon != null)
             {

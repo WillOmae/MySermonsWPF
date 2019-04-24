@@ -6,11 +6,11 @@
              xmlns:local="clr-namespace:MySermonsWPF.UI"
              mc:Ignorable="d" 
              d:DesignHeight="20" d:DesignWidth="100"
-             x:Name="MSTabItemHeaderBase">
+             x:Name="BaseTabItemHeader">
     <Canvas Width="100"
             Height="20"
             Margin="0">
-        <Label  x:Name="MSTabItemHeaderText"
+        <Label  x:Name="BaseTabItemHeaderText"
                 Canvas.Left="0"
                 Canvas.Top="0"
                 Width="90"
@@ -27,11 +27,11 @@
                Margin="0"
                VerticalContentAlignment="Center"
                HorizontalContentAlignment="Center">
-            <Image x:Name="MSTabItemHeaderClose"
+            <Image x:Name="BaseTabItemHeaderClose"
                    Width="10"
                    Height="10"
-                   MouseEnter="MSTabItemHeaderClose_MouseEnter"
-                   MouseLeave="MSTabItemHeaderClose_MouseLeave"
+                   MouseEnter="BaseTabItemHeaderClose_MouseEnter"
+                   MouseLeave="BaseTabItemHeaderClose_MouseLeave"
                    Source="Resources/Close.png"/>
         </Label>
     </Canvas>

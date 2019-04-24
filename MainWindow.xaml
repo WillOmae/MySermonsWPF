@@ -19,7 +19,7 @@
         </Style>
     </Window.Resources>
     <DockPanel LastChildFill="True">
-        <Menu x:Name="MenuBar"
+        <Menu x:Name="BaseMenuBar"
               DockPanel.Dock="Top"
               Style="{StaticResource MajorControlStyle}">
             <MenuItem Header="File">
@@ -48,14 +48,14 @@
                 <MenuItem Header="About"/>
             </MenuItem>
         </Menu>
-        <StatusBar x:Name="MSStatusBar"
+        <StatusBar x:Name="BaseStatusBar"
                    DockPanel.Dock="Bottom"
                    Style="{StaticResource MajorControlStyle}">
             <TextBlock>
                 Ready!
             </TextBlock>
         </StatusBar>
-        <TreeView x:Name="MSTreeview"
+        <TreeView x:Name="BaseTreeview"
                   DockPanel.Dock="Left"
                   Width="150"
                   ItemsSource="{x:Static local:MainWindow.Sermons}"
@@ -74,7 +74,7 @@
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
-        <custom:MSTabControl x:Name="MSTabControl"
+        <custom:MSTabControl x:Name="BaseTabControl"
                              Style="{StaticResource MajorControlStyle}">
 
         </custom:MSTabControl>

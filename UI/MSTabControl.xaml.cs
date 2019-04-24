@@ -32,16 +32,16 @@ namespace MySermonsWPF.UI
                             if(tabItem.Header is string headerText)
                             {
                                 MSTabItemHeader tabItemHeader = new MSTabItemHeader();
-                                tabItemHeader.MSTabItemHeaderText.Content = headerText;
+                                tabItemHeader.BaseTabItemHeaderText.Content = headerText;
                                 tabItem.Header = tabItemHeader;
                                 tabItemHeader.MouseDoubleClick += delegate
                                 {
                                     this.Items.Remove(tabItem);
                                 };
-                                tabItemHeader.MSTabItemHeaderBase.MouseDoubleClick += delegate
+                                tabItemHeader.BaseTabItemHeader.MouseDoubleClick += delegate
                                 {
                                     this.Items.Remove(tabItem);
-                                }; tabItemHeader.MSTabItemHeaderClose.MouseLeftButtonUp += delegate
+                                }; tabItemHeader.BaseTabItemHeaderClose.MouseLeftButtonUp += delegate
                                 {
                                     this.Items.Remove(tabItem);
                                 };

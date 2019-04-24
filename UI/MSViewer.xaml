@@ -25,7 +25,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
-        <TextBlock x:Name="MSViewerTitle"
+        <TextBlock x:Name="BaseViewerTitle"
                    x:FieldModifier="private"
                    DockPanel.Dock="Top"
                    TextAlignment="Center"
@@ -34,7 +34,7 @@
                    FontStretch="Medium"
                    FontWeight="Bold"
                    Padding="10"/>
-        <RichTextBox x:Name="MSViewerContent"
+        <RichTextBox x:Name="BaseViewerContent"
                      x:FieldModifier="private"
                      IsReadOnly="True"
                      Style="{DynamicResource NoBorderStyle}"/>
