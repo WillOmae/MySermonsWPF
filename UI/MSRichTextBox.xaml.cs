@@ -216,8 +216,9 @@ namespace MySermonsWPF.UI
             }
             else
             {
+                char themeDelimiter = ',';
                 Location location = string.IsNullOrEmpty(this.MetaLocation.Text) ? null : new Location(this.MetaLocation.Text, StringType.Name);
-                List<Theme> themes = string.IsNullOrEmpty(this.MetaThemes.Text) ? null : new List<Theme>() { new Theme(this.MetaThemes.Text, StringType.Name) };
+                List<Theme> themes = string.IsNullOrEmpty(this.MetaThemes.Text) ? null : Theme.ExtractFromDelimitedString(this.MetaThemes.Text, themeDelimiter);
                 string content = this.documentManager.IsEmpty() ? null : this.documentManager.GetRichText();
                 string title = string.IsNullOrEmpty(this.MetaTitle.Text) ? null : this.MetaTitle.Text;
                 string keyText = string.IsNullOrEmpty(this.MetaKeyText.Text) ? null : this.MetaKeyText.Text;
