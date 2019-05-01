@@ -176,6 +176,11 @@ namespace MySermonsWPF.UI
             control.Focus();
         }
 
+        public Sermon GetSermon()
+        {
+            return this.sermon;
+        }
+
         private void Save()
         {
             if(string.IsNullOrEmpty(this.MetaTitle.Text))
@@ -210,7 +215,7 @@ namespace MySermonsWPF.UI
                 }
             }
         }
-        
+
         private enum MetadataPanelToggle
         {
             Open, Close
