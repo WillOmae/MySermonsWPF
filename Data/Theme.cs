@@ -260,5 +260,22 @@ namespace MySermonsWPF.Data
             string sql = "DELETE FROM `sermon_themes` WHERE sermon_id=@sermonId";
             Database.Delete(sql, sermonId);
         }
+        /// <summary>
+        /// Extract themes from a delimited string.
+        /// </summary>
+        /// <param name="delimitedString">The delimited string to be parsed.</param>
+        /// <param name="delimiter">The delimiter to be used.</param>
+        /// <returns>List of themes.</returns>
+        public static List<Theme> ExtractFromDelimitedString(string delimitedString, char delimiter)
+        {
+            List<Theme> themes = new List<Theme>();
+
+            var splits = delimitedString.Split(delimiter);
+            foreach(var split in splits)
+            {
+                themes.Add(new Theme(split.Trim(' '), StringType.Name));
+            }
+            return themes;
+        }
     }
 }
