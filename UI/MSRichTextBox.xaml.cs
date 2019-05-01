@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -47,6 +48,10 @@ namespace MySermonsWPF.UI
             this.RTBFontSize.ItemsSource = new double[] { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72 };
             this.RTBFontSize.SelectedItem = 12D;
             this.RTBFont.SelectedItem = new FontFamily("Arial");
+            if(this.sermon != null)
+            {
+                this.SetUpEditor();
+            }
         }
 
         /// <summary>
@@ -179,6 +184,26 @@ namespace MySermonsWPF.UI
         public Sermon GetSermon()
         {
             return this.sermon;
+        }
+
+        private void SetUpEditor()
+        {
+            StringBuilder themesBuilder = new StringBuilder();
+            foreach(var theme in this.sermon.Themes)
+            {
+                if(theme.Name != "THEME_NOT_SET")
+                {
+                    themesBuilder = themesBuilder.Append(theme.Name).Append(", ");
+                }
+            }
+            string themes = themesBuilder.ToString().TrimEnd(',', ' ');
+            this.MetaTitle.Text = this.sermon.Title == "TITLE_NOT_SET" ? string.Empty : this.sermon.Title;
+            this.MetaSpeaker.Text = string.Empty;
+            this.MetaKeyText.Text = this.sermon.KeyVerse == "KEY_VERSE_NOT_SET" ? string.Empty : this.sermon.KeyVerse;
+            this.MetaLocation.Text = this.sermon.Location.Name == "LOCATION_NOT_SET" ? string.Empty : this.sermon.Location.Name;
+            this.MetaThemes.Text = themes;
+            this.MetaOtherInfo.Text = this.sermon.OtherMetaData == "OTHER_METADATA_NOT_SET" ? string.Empty : this.sermon.OtherMetaData;
+            this.documentManager.SetRichText(this.sermon.Content == "CONTENT_NOT_SET" ? string.Empty : this.sermon.Content);
         }
 
         private void Save()
