@@ -58,6 +58,10 @@ namespace MySermonsWPF.UI
                 this.ViewerContent = this.sermon.Content;
             }
         }
+        public Sermon GetSermon()
+        {
+            return sermon;
+        }
         private void PrintCommandExecuted(object target, ExecutedRoutedEventArgs e)
         {
             MessageBox.Show("Printing...");
