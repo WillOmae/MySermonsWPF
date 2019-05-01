@@ -241,7 +241,7 @@ namespace MySermonsWPF.Data
             Sermon sermon = Read(id);
             this.CommonInit(sermon.ID, sermon.GUID, sermon.Title, sermon.Location.ID, sermon.Location.Name, sermon.Location, sermon.Themes, sermon.DateCreated.Ticks, sermon.DateLastAccessed.Ticks, sermon.KeyVerse, sermon.OtherMetaData, sermon.Content);
         }
-        
+
         /// <summary>
         /// Build sermon from GUID.
         /// </summary>
@@ -332,7 +332,7 @@ namespace MySermonsWPF.Data
                 return false;
             }
         }
-        
+
         /// <summary>
         /// Update the sermon in the database.
         /// </summary>
@@ -351,7 +351,7 @@ namespace MySermonsWPF.Data
                 return false;
             }
         }
-        
+
         /// <summary>
         /// Delete the sermon from the database.
         /// </summary>
@@ -369,7 +369,7 @@ namespace MySermonsWPF.Data
                 return false;
             }
         }
-        
+
         /// <summary>
         /// Select by ID.
         /// </summary>
@@ -390,7 +390,7 @@ namespace MySermonsWPF.Data
                 return null;
             }
         }
-        
+
         /// <summary>
         /// Select by GUID.
         /// </summary>
@@ -411,7 +411,7 @@ namespace MySermonsWPF.Data
                 return null;
             }
         }
-        
+
         /// <summary>
         /// Selects all sermons.
         /// </summary>
@@ -421,7 +421,7 @@ namespace MySermonsWPF.Data
             List<Dictionary<string, object>> reader = Database.Read(SELECT_STATEMENT);
             return BuildFromReader(reader);
         }
-        
+
         /// <summary>
         /// Builds a list of sermons from a more generic list returned by the database class.
         /// </summary>
@@ -534,7 +534,7 @@ namespace MySermonsWPF.Data
             }
             return sortedSermons.Count > 0 ? sortedSermons : null;
         }
-        
+
         /// <summary>
         /// Creates a <see cref="SortedSermons"/> object and adds it to the <paramref name="list"/>.
         /// </summary>
@@ -552,6 +552,11 @@ namespace MySermonsWPF.Data
                 };
                 list.Add(sortedSermons);
             }
+        }
+
+        public bool Equals(Sermon test)
+        {
+            return this.Content == test.Content && this.Title == test.Title && this.DateCreated == test.DateCreated;
         }
     }
 }
