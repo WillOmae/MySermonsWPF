@@ -20,8 +20,10 @@ namespace MySermonsWPF.UI
         /// </summary>
         private Sermon sermon = null;
         private MSDocumentManager documentManager = null;
-        private BitmapImage closeIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/Formatbar/close2.png"));
-        private BitmapImage openIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/Formatbar/open.png"));
+        private BitmapImage closeIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/collapse.png"));
+        private BitmapImage openIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/expand.png"));
+        private string closePanelTooltip = "Close details panel.";
+        private string openPanelTooltip = "Open details panel";
 
         /// <summary>
         /// Constructor accepting a parameter of type sermon.
@@ -82,12 +84,10 @@ namespace MySermonsWPF.UI
             switch(this.MetadataPanel.Visibility)
             {
                 case Visibility.Collapsed:
-                    this.MetadataPanel.Visibility = Visibility.Visible;
-                    this.RTBMetadataIcon.Source = this.closeIcon;
+                    this.ToggleMetadataPanelOpening(MetadataPanelToggle.Open);
                     break;
                 case Visibility.Visible:
-                    this.MetadataPanel.Visibility = Visibility.Collapsed;
-                    this.RTBMetadataIcon.Source = this.openIcon;
+                    this.ToggleMetadataPanelOpening(MetadataPanelToggle.Close);
                     break;
             }
         }
@@ -146,13 +146,43 @@ namespace MySermonsWPF.UI
             }
         }
 
+        private void BaseRichTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if(this.MetadataPanel.Visibility == Visibility.Visible)
+            {
+                this.ToggleMetadataPanelOpening(MetadataPanelToggle.Close);
+            }
+        }
+
+        private void ToggleMetadataPanelOpening(MetadataPanelToggle toggle)
+        {
+            switch(toggle)
+            {
+                case MetadataPanelToggle.Open:
+                    this.MetadataPanel.Visibility = Visibility.Visible;
+                    this.ExpandMetadataPanel.ToolTip = this.closePanelTooltip;
+                    this.ExpandMetadataPanelImage.Source = this.closeIcon;
+                    break;
+                case MetadataPanelToggle.Close:
+                    this.MetadataPanel.Visibility = Visibility.Collapsed;
+                    this.ExpandMetadataPanel.ToolTip = this.openPanelTooltip;
+                    this.ExpandMetadataPanelImage.Source = this.openIcon;
+                    break;
+            }
+        }
+
+        private void FocusMetadataPanelControl(Control control)
+        {
+            control.Focus();
+        }
+
         private void Save()
         {
             if(string.IsNullOrEmpty(this.MetaTitle.Text))
             {
+                this.ToggleMetadataPanelOpening(MetadataPanelToggle.Open);
                 MessageBox.Show("Specify sermon title", "Title not set", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                this.MetadataPanel.Visibility = Visibility.Visible;
-                this.RTBMetadataIcon.Source = this.closeIcon;
+                this.FocusMetadataPanelControl(this.MetaTitle);
             }
             else
             {
@@ -179,6 +209,11 @@ namespace MySermonsWPF.UI
                     MessageBox.Show("Update successful: " + this.sermon.Update());
                 }
             }
+        }
+        
+        private enum MetadataPanelToggle
+        {
+            Open, Close
         }
     }
 }
