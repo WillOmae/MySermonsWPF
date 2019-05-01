@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -46,7 +47,46 @@ namespace MySermonsWPF.UI
                                     this.Items.Remove(tabItem);
                                 };
                             }
-                            this.BaseTabControl.Items.Add(tabItem);
+                            // prevent duplicate viewers
+                            if(tabItem.Content is MSViewer viewer)
+                            {
+                                var sermon = viewer.GetSermon();
+                                ItemCollection collection = this.BaseTabControl.Items;
+                                var found = (from TabItem collectionItem in collection
+                                             where (collectionItem.Content as MSViewer) != null && (collectionItem.Content as MSViewer).GetSermon().Equals(sermon)
+                                             select collectionItem).FirstOrDefault();
+                                if(found != null)
+                                {
+                                    this.Items.Remove(tabItem);
+                                    BaseTabControl.SelectedItem = found;
+                                }
+                                else
+                                {
+                                    this.BaseTabControl.Items.Add(tabItem);
+                                }
+                            }
+                            // prevent duplicate editors
+                            else if(tabItem.Content is MSRichTextBox richTextBox)
+                            {
+                                var sermon = richTextBox.GetSermon();
+                                ItemCollection collection = this.BaseTabControl.Items;
+                                var found = (from TabItem collectionItem in collection
+                                             where (collectionItem.Content as MSRichTextBox) != null && (collectionItem.Content as MSRichTextBox).GetSermon() != null && (collectionItem.Content as MSRichTextBox).GetSermon().Equals(sermon)
+                                             select collectionItem).FirstOrDefault();
+                                if(found != null)
+                                {
+                                    this.Items.Remove(tabItem);
+                                    BaseTabControl.SelectedItem = found;
+                                }
+                                else
+                                {
+                                    this.BaseTabControl.Items.Add(tabItem);
+                                }
+                            }
+                            else
+                            {
+                                this.BaseTabControl.Items.Add(tabItem);
+                            }
                         }
                     }
                     break;
@@ -92,7 +132,7 @@ namespace MySermonsWPF.UI
         }
         public void SetSelectedItem(TabItem tabItem)
         {
-            BaseTabControl.SelectedItem = tabItem;
+            this.BaseTabControl.SelectedItem = tabItem;
         }
     }
 }
