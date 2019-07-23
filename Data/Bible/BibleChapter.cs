@@ -1,7 +1,7 @@
 ﻿namespace MySermonsWPF.Data.Bible
 {
     /// <summary>
-    /// Class defining a Bible Chapter.
+    /// Class defining a Bible chapter.
     /// </summary>
     public class BibleChapter
     {
@@ -22,6 +22,14 @@
         {
             ChapterId = chapter;
             VerseCount = verseCount;
+        }
+        /// <summary>
+        /// Return a string representation of the object.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return "Chapter: " + ChapterId + ". Verses: " + VerseCount + ".";
         }
     }
 }
