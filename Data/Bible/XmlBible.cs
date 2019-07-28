@@ -141,7 +141,7 @@ namespace MySermonsWPF.Data.Bible
                                 if (bcv.Equals(bcvStart) || started)
                                 {
                                     started = true;
-                                    bibleVerses.Add(new BibleVerse(bcv, bcv, verseNode.InnerText));
+                                    bibleVerses.Add(new BibleVerse(bcv, this.Books[i].NameShort + " " + (j + 1) + ":" + (k + 1), verseNode.InnerText));
                                     if (bcv.Equals(bcvEnd))
                                     {
                                         started = false;
