@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace MySermonsWPF.Data.Bible
@@ -33,6 +30,18 @@ namespace MySermonsWPF.Data.Bible
             Bible = new XmlDocument();
             Bible.Load("BibleXml.xml");
             Books = ReadBooks();
+        }
+        public List<BibleVerse> Parse(string toParse)
+        {
+            string bcvStart, bcvEnd;
+            if (VerifyRange(bcvStart, bcvEnd))
+            {
+                return (GetVerses(bcvStart, bcvEnd));
+            }
+            else
+            {
+                return null;
+            }
         }
         /// <summary>
         /// Builds an array of BibleBook's.
