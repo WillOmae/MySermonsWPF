@@ -83,16 +83,9 @@ namespace MySermonsWPF.Data.Bible
             var splits = toParse.Split(new char[] { SEPARATOR_INBLOCK }, System.StringSplitOptions.RemoveEmptyEntries);
             foreach (var split in splits)
             {
-                string toPass = split;
-                if (currentBook != null)
-                {
-                    if (currentBook.Length > 1)
-                    {
-                        toPass = ParseString3(currentBook, currentChapter, currentVerse, split, addedVerse);
-                    }
-                }
-                var bcv = ParseString4(ref currentBook, ref currentChapter, ref currentVerse, toPass, out addedVerse);
-                var current = bcv.Split('.');
+                string toPass = currentBook == null ? split : ParseString3(currentBook, currentChapter, currentVerse, split, addedVerse);
+                var bcv = ParseString4(ref currentBook, ref currentChapter, ref currentVerse, toPass, addedVerse, out addedVerse);
+                var current = BcvExtractor(bcv);
                 currentBook = current[0];
                 currentChapter = current[1];
                 currentVerse = current[2];
@@ -102,110 +95,116 @@ namespace MySermonsWPF.Data.Bible
         }
         private string ParseString3(string currentBook, string currentChapter, string currentVerse, string stringToParse, bool addedVerse)
         {
-            string newBook, newChapter, newVerse, returnString;
+            string newBook, returnString;
 
             newBook = currentBook;
             if (stringToParse.Contains(SEPARATOR_CV.ToString()))//only the book is shared; it contains its own chapter and verse
             {
-                newChapter = stringToParse.Remove(stringToParse.IndexOf(SEPARATOR_CV));
-                newVerse = stringToParse.Remove(0, stringToParse.IndexOf(SEPARATOR_CV) + 1);
-                returnString = newBook + newChapter + SEPARATOR_CV + newVerse;
+                var splits = stringToParse.Split(SEPARATOR_CV);
+                returnString = newBook + splits[0] + SEPARATOR_CV + splits[1];
             }
             else
             {
-                if (currentVerse == null || currentVerse.Length < 1)//only chapter is recorded, so the string represents a chapter as well
+                if (currentVerse == null)//only chapter is recorded, so the string represents a chapter as well
                 {
-                    newChapter = stringToParse;
-                    returnString = newBook + newChapter;
+                    returnString = newBook + stringToParse;
                 }
                 else
                 {
                     if (addedVerse)//only the book is shared e.g. PSA140,141
                     {
-                        newChapter = stringToParse;
-                        returnString = newBook + newChapter;
+                        returnString = newBook + stringToParse;
                     }
                     else//both book and chapter are shared e.g. HEB11:1,6
                     {
-                        newChapter = currentChapter;
-                        newVerse = stringToParse;
-                        returnString = newBook + newChapter + SEPARATOR_CV + newVerse;
+                        returnString = newBook + currentChapter + SEPARATOR_CV + stringToParse;
                     }
                 }
             }
             return returnString;
         }
-        private string ParseString4(ref string currentBook, ref string currentChapter, ref string currentVerse, string stringToParse, out bool addedVerse)
+        private string ParseString4(ref string currentBook, ref string currentChapter, ref string currentVerse, string stringToParse, bool addedStartVerse, out bool addedVerse)
         {
             string startBook = null, startChapter = null, startVerse = null, startBcv = null;
             string endBook = null, endChapter = null, endVerse = null, endBcv = null;
-            int index = 0;
-            bool foundChapter = false, foundCVSeparator = false;
+            bool foundChapter = currentChapter == null ? false : stringToParse.Contains(SEPARATOR_CV) ? false : !addedStartVerse;
+            bool foundCVSeparator = false;
 
-            foreach (char c in stringToParse)
+            addedVerse = false;
+            for (int i = 0; i < stringToParse.Length; i++)
             {
-                if (char.IsDigit(c) == true && index == 0)
+                char c = stringToParse[i];
+                if (char.IsDigit(c) && i == 0 && stringToParse.Length > 1 && char.IsLetter(stringToParse[i + 1]))
                 {
                     startBook += c;
+                    foundChapter = false;
                 }
-                else if (char.IsLetter(c) == true)
+                else if (char.IsLetter(c))
                 {
                     startBook += c;
+                    foundChapter = false;
                 }
-                else if (char.IsDigit(c) == true && foundChapter == false)
+                else if (char.IsDigit(c) && !foundChapter)
                 {
                     startChapter += c;
                 }
-                else if (char.IsPunctuation(c) == true && c == SEPARATOR_CV)
+                else if (c == SEPARATOR_CV)
                 {
                     foundChapter = true;
                     foundCVSeparator = true;
                 }
-                else if (char.IsDigit(c) == true)
+                else if (char.IsDigit(c))
                 {
                     startVerse += c;
                 }
-                else if (char.IsPunctuation(c) == true && c == SEPARATOR_RANGE)//get the end BCVstruct
-                {//sample ~Heb13-Jas1~
+                else if (c == SEPARATOR_RANGE)
+                {
                     if (foundCVSeparator)
                     {
-                        ParseString5(stringToParse.Remove(0, stringToParse.IndexOf(c) + 1), startBook, startChapter, startVerse, ref endBook, ref endChapter, ref endVerse);
+                        var end = ParseString4(ref startBook, ref startChapter, ref startVerse, stringToParse.Remove(0, i + 1), addedStartVerse, out addedVerse);
+                        if (end.Contains('-'))
+                        {
+                            end = end.Split(new char[] { '-' }, System.StringSplitOptions.RemoveEmptyEntries)[1];
+                        }
+                        var splits = BcvExtractor(end);
+                        endBook = splits[0];
+                        endChapter = splits[1];
+                        endVerse = splits[2];
                     }
-                    else
+                    else //sample Heb13-Jas1 or Heb1-2
                     {
                         startVerse = "1";
-                        string pass = stringToParse.Remove(0, stringToParse.IndexOf(c) + 1);
-                        int firstDigitIndex = 0;
-                        for (int i = 0; i < pass.Length; i++)
+                        addedStartVerse = true;
+                        //addedVerse = true;
+                        string pass = stringToParse.Remove(0, i + 1);
+                        string end = ParseString4(ref startBook, ref startChapter, ref startVerse, pass, addedStartVerse, out addedVerse);
+                        if (end.Contains('-'))
                         {
-                            char x = pass[i];
-                            if (char.IsDigit(x))
-                            {
-                                try
-                                {
-                                    if (!char.IsLetter(pass[i + 1]))
-                                    {
-                                        firstDigitIndex = pass.IndexOf(x);
-                                        break;
-                                    }
-                                }
-                                catch
-                                {
-                                    firstDigitIndex = pass.IndexOf(x);
-                                }
-                            }
+                            end = end.Split(new char[] { '-' }, System.StringSplitOptions.RemoveEmptyEntries)[1];
                         }
-                        string book = pass.Remove(firstDigitIndex), chapter = pass.Remove(0, firstDigitIndex);
-                        pass = book + chapter + ":" + VerseCount(book, chapter);
-
-                        ParseString5(pass, startBook, startChapter, startVerse, ref endBook, ref endChapter, ref endVerse);
+                        var splits = BcvExtractor(end);
+                        endBook = splits[0];
+                        endChapter = splits[1];
+                        endVerse = splits[2];
                     }
                     break;
                 }
-                index++;
             }
 
-            if (startBook != null)
+            if (startBook == null)
+            {
+                startBook = currentBook;
+                if (startChapter == null)
+                {
+                    startChapter = currentChapter;
+                }
+                if (startVerse == null)
+                {
+                    startVerse = currentVerse == null ? "1" : VerseCount(startBook, startChapter).ToString();
+                }
+                startBcv = BcvBuilder(startBook, startChapter, startVerse);
+            }
+            else
             {
                 //No verse stated, no range given e.g. ~james1~
                 if (startVerse == null && endBook == null)
@@ -220,90 +219,25 @@ namespace MySermonsWPF.Data.Bible
                 {
                     addedVerse = false;//***********NOTE
                 }
-                startBcv = startBook.ToUpper() + "." + startChapter + "." + startVerse;//generate bcv
+                startBcv = BcvBuilder(startBook, startChapter, startVerse);
             }
-            else
-            {
-                startBcv = null;
-                addedVerse = false;//***********NOTE
-            }
-            if (endBook != null)
-            {
-                endBcv = endBook.ToUpper() + "." + endChapter + "." + endVerse;//generate bcv
-                return startBcv + "-" + endBcv;
-            }
-            else
+            if (endBook == null)
             {
                 return startBcv;
             }
+            else
+            {
+                endBcv = BcvBuilder(endBook, endChapter, endVerse);
+                return startBcv + "-" + endBcv;
+            }
         }
-        private void ParseString5(string stringToParse, string startBook, string startChapter, string startVerse, ref string endBook, ref string endChapter, ref string endVerse)
+        private string BcvBuilder(string book, string chapter, string verse)
         {
-            bool chapterFound = false;
-
-            try
-            {
-                if (char.IsDigit(stringToParse[0]) && char.IsLetter(stringToParse[1]))//e.g 2John1:1-3John1:1
-                {
-                    endBook += stringToParse[0];
-                }
-            }
-            catch { }
-            foreach (char c in stringToParse)
-            {
-                if (char.IsLetter(c))//e.g Hebrews11:1-Hebrews12:1
-                {
-                    endBook += c;
-                    stringToParse = stringToParse.Remove(0, stringToParse.IndexOf(c) + 1);
-                }
-            }
-
-            if (endBook == null)//e.g Hebrews11:1-12:1 End.Book should be Hebrews as well
-            {
-                endBook = startBook;
-            }
-
-            foreach (char c in stringToParse)
-            {
-                if (char.IsPunctuation(c) && c == ':')//e.g Hebrews11:1-12:1
-                {
-                    chapterFound = true;
-                }
-            }
-            if (chapterFound)//e.g Hebrews11:1-12:1 chapter is 12
-            {
-                endChapter = stringToParse.Remove(stringToParse.IndexOf(':'));
-                stringToParse = stringToParse.Remove(0, stringToParse.IndexOf(':') + 1);
-            }
-            else//e.g Hebrews11:1-12 or //e.g Hebrews11-12
-            {
-                if (startVerse == null)//e.g Hebrews11-12
-                {
-                    foreach (char c in stringToParse)
-                    {
-                        endChapter += c;
-                        stringToParse = stringToParse.Remove(0, stringToParse.IndexOf(c) + 1);
-                    }
-                }
-                else//e.g Hebrews11:1-12 chapter should be 11 as well i.e Hebrews 11:12 for End
-                {
-                    endChapter = startChapter;
-                }
-            }
-            if (stringToParse != null && stringToParse.Length > 0)
-            {
-                foreach (char c in stringToParse)
-                {
-                    if (startVerse == null)
-                    {
-                        endChapter += c;
-                    }
-                    else
-                    {
-                        endVerse += c;
-                    }
-                }
-            }
+            return book.ToUpper() + "." + chapter + "." + verse;
+        }
+        private string[] BcvExtractor(string bcv)
+        {
+            return bcv.Split('.');
         }
         private int VerseCount(string book, string chapter)
         {
@@ -324,16 +258,15 @@ namespace MySermonsWPF.Data.Bible
         {
             BibleBook[] books = new BibleBook[66];
             var booknames = (from XmlElement book in BibleBookNames.ChildNodes
-                             select new string[3] { book.Attributes["c"].Value, book.Attributes["abbr"].Value, book.Attributes["short"].Value }).ToArray();
+                             select new string[2] { book.Attributes["a"].Value, book.Attributes["s"].Value }).ToArray();
             for (int i = 0; i < KJVBibleNode.ChildNodes.Count; i++)
             {
                 BibleChapter[] chapters = new BibleChapter[KJVBibleNode.ChildNodes[i].ChildNodes.Count];
                 for (int j = 0; j < KJVBibleNode.ChildNodes[i].ChildNodes.Count; j++)
                 {
-                    chapters[j] = new BibleChapter(int.Parse(KJVBibleNode.ChildNodes[i].ChildNodes[j].Attributes["ID"].Value),
-                                                   KJVBibleNode.ChildNodes[i].ChildNodes[j].ChildNodes.Count);
+                    chapters[j] = new BibleChapter(j + 1, KJVBibleNode.ChildNodes[i].ChildNodes[j].ChildNodes.Count);
                 }
-                books[i] = new BibleBook(booknames[i][0], booknames[i][1], booknames[i][2], chapters);
+                books[i] = new BibleBook(booknames[i][0], booknames[i][1], chapters);
             }
             return books;
         }
@@ -347,8 +280,8 @@ namespace MySermonsWPF.Data.Bible
         {
             if (bcvStart == null || bcvEnd == null)
                 return false;
-            var partsStart = bcvStart.Split('.');
-            var partsEnd = bcvEnd.Split('.');
+            var partsStart = BcvExtractor(bcvStart);
+            var partsEnd = BcvExtractor(bcvEnd);
             var iBookStart = FindBookIndex(partsStart[0]);
             var iBookEnd = FindBookIndex(partsEnd[0]);
 
@@ -366,9 +299,14 @@ namespace MySermonsWPF.Data.Bible
                 && iVerseStart > 0
                 && iVerseEnd > 0
                 && iVerseStart <= this.Books[iBookStart].Chapters[iChapStart - 1].VerseCount
-                && iVerseEnd <= this.Books[iBookEnd].Chapters[iChapEnd - 1].VerseCount)
+                && iVerseEnd <= this.Books[iBookEnd].Chapters[iChapEnd - 1].VerseCount
+                && CompareStartAndFinish(iBookStart, iChapStart, iVerseStart, iBookEnd, iChapEnd, iVerseEnd))
                 return true;
             else return false;
+        }
+        private bool CompareStartAndFinish(int startBook, int startChapter, int startVerse, int endBook, int endChapter, int endVerse)
+        {
+            return startBook < endBook || (startBook == endBook && (startChapter < endChapter || (startChapter == endChapter && startVerse <= endVerse)));
         }
         /// <summary>
         /// Returns the index of a book from the BibleBook array.
@@ -379,7 +317,7 @@ namespace MySermonsWPF.Data.Bible
         {
             for (int i = 0; i < Books.Length; i++)
             {
-                if (Books[i].NameAbbr.Equals(book))
+                if (Books[i].NameAbbr.ToLower().Equals(book.ToLower()))
                 {
                     return i;
                 }
@@ -394,7 +332,7 @@ namespace MySermonsWPF.Data.Bible
         /// <returns>List of BibleVerses.</returns>
         private List<BibleVerse> GetVerses(string bcvStart, string bcvEnd)
         {
-            var parts = bcvStart.Split('.');
+            var parts = BcvExtractor(bcvStart);
             bool started = false;
 
             List<BibleVerse> bibleVerses = new List<BibleVerse>();
@@ -402,20 +340,23 @@ namespace MySermonsWPF.Data.Bible
             for (int i = 0; i < KJVBibleNode.ChildNodes.Count; i++)
             {
                 var bookNode = KJVBibleNode.ChildNodes[i];
-                if (bookNode.Attributes["NAME"].Value.Equals(parts[0]) || started)
+                var bookIndex = FindBookIndex(parts[0]);
+                if (bookIndex == i || started)
                 {
                     for (int j = 0; j < bookNode.ChildNodes.Count; j++)
                     {
                         var chapterNode = bookNode.ChildNodes[j];
-                        if (chapterNode.Attributes["ID"].Value.Equals(parts[1]) || started)
+                        var chapterIndex = int.Parse(parts[1]) - 1;
+                        if (chapterIndex == j || started)
                         {
                             for (int k = 0; k < chapterNode.ChildNodes.Count; k++)
                             {
                                 var verseNode = chapterNode.ChildNodes[k];
-                                var bcv = verseNode.Attributes["BCV"].Value;
-                                if (bcv.Equals(bcvStart) || started)
+                                var verseIndex = int.Parse(parts[2]) - 1;
+                                if (verseIndex == k || started)
                                 {
                                     started = true;
+                                    var bcv = Books[i].NameAbbr.ToUpper() + "." + (j + 1) + "." + (k + 1);
                                     bibleVerses.Add(new BibleVerse(bcv, this.Books[i].NameShort + " " + (j + 1) + ":" + (k + 1), verseNode.InnerText));
                                     if (bcv.Equals(bcvEnd))
                                     {
