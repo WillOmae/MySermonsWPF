@@ -200,7 +200,7 @@ namespace MySermonsWPF.Data.Bible
                 }
                 if (startVerse == null)
                 {
-                    startVerse = currentVerse == null ? "1" : VerseCount(startBook, startChapter).ToString();
+                    startVerse = currentVerse == null ? "1" : VerseCount(startBook.ToUpper(), startChapter).ToString();
                 }
                 startBcv = BcvBuilder(startBook, startChapter, startVerse);
             }
@@ -212,7 +212,7 @@ namespace MySermonsWPF.Data.Bible
                     startVerse = "1";
                     endBook = startBook;
                     endChapter = startChapter;
-                    endVerse = VerseCount(endBook, endChapter).ToString();
+                    endVerse = VerseCount(endBook.ToUpper(), endChapter).ToString();
                     addedVerse = true;//***********NOTE
                 }
                 else
@@ -231,19 +231,37 @@ namespace MySermonsWPF.Data.Bible
                 return startBcv + "-" + endBcv;
             }
         }
+        /// <summary>
+        /// Constructs a bcv from specified components.
+        /// </summary>
+        /// <param name="book">Uppercase book string.</param>
+        /// <param name="chapter">Numeric chapter.</param>
+        /// <param name="verse">Numeric verse.</param>
+        /// <returns>Built bcv.</returns>
         private string BcvBuilder(string book, string chapter, string verse)
         {
             return book.ToUpper() + "." + chapter + "." + verse;
         }
+        /// <summary>
+        /// Extracts components of a given bcv.
+        /// </summary>
+        /// <param name="bcv">The specified bcv in XYZ.#.# format</param>
+        /// <returns>bcv components.</returns>
         private string[] BcvExtractor(string bcv)
         {
             return bcv.Split('.');
         }
+        /// <summary>
+        /// Determines the number of verses in a given chapter of a book.
+        /// </summary>
+        /// <param name="book">Valid, 3-letter, uppercase book name.</param>
+        /// <param name="chapter">Specified chapter.</param>
+        /// <returns>Count or 1.</returns>
         private int VerseCount(string book, string chapter)
         {
             for (int i = 0; i < Books.Length; i++)
             {
-                if (Books[i].NameAbbr.ToLower().Equals(book.ToLower()))
+                if (Books[i].NameAbbr.ToUpper().Equals(book))
                 {
                     return Books[i].Chapters[(int.Parse(chapter)) - 1].VerseCount;
                 }
@@ -304,6 +322,16 @@ namespace MySermonsWPF.Data.Bible
                 return true;
             else return false;
         }
+        /// <summary>
+        /// Compares bcv's for order of books, chapters and verses. e.g Heb 11:6,12 is valid while Heb 11:6,2 is not.
+        /// </summary>
+        /// <param name="startBook">Start book index.</param>
+        /// <param name="startChapter">Start chapter.</param>
+        /// <param name="startVerse">Start verse.</param>
+        /// <param name="endBook">End book index.</param>
+        /// <param name="endChapter">End chapter.</param>
+        /// <param name="endVerse">End verse.</param>
+        /// <returns>True if valid. False otherwise.</returns>
         private bool CompareStartAndFinish(int startBook, int startChapter, int startVerse, int endBook, int endChapter, int endVerse)
         {
             return startBook < endBook || (startBook == endBook && (startChapter < endChapter || (startChapter == endChapter && startVerse <= endVerse)));
