@@ -34,8 +34,6 @@ namespace MySermonsWPF.Data.Bible
             Bible = new XmlDocument();
             Bible.Load("BibleXml.xml");
             Books = ReadBooks();
-            var parsed = Parse("rev1:1,2,mrk1:41,23,tit3,1ti3");
-            parsed.ToString();
         }
         public List<BibleVerse> Parse(string toParse)
         {
