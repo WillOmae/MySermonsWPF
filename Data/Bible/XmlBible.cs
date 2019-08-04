@@ -34,6 +34,8 @@ namespace MySermonsWPF.Data.Bible
             Bible = new XmlDocument();
             Bible.Load("BibleXml.xml");
             Books = ReadBooks();
+            var parsed = Parse("rev1:1,2,mrk1:41,23,tit3,1ti3");
+            parsed.ToString();
         }
         public List<BibleVerse> Parse(string toParse)
         {
@@ -64,11 +66,34 @@ namespace MySermonsWPF.Data.Bible
             List<string> bcvs = new List<string>();
 
             //ensure uniformity in parsing all strings: block separator must exist in all strings
-            toParse = toParse.EndsWith(SEPARATOR_BLOCK.ToString()) ? toParse : toParse + SEPARATOR_BLOCK;
+            toParse += SEPARATOR_BLOCK;
             var splits = toParse.Split(new char[] { SEPARATOR_BLOCK }, System.StringSplitOptions.RemoveEmptyEntries);
             foreach (var split in splits)
             {
-                bcvs.AddRange(this.ParseString2(split));
+                SortedSet<int> indices = new SortedSet<int>();
+                int temp = 0;
+                for (int i = 0; i < split.Length; i++)
+                {
+                    if (char.IsLetter(split[i]))
+                    {
+                        indices.Add(temp);
+                    }
+                    if (split[i] == SEPARATOR_INBLOCK)
+                    {
+                        temp = i + 1;
+                    }
+                }
+                indices.Add(split.Length);
+                var indicesArray = indices.ToArray();
+                List<string> strings = new List<string>();
+                for (int i = 0; i < indices.Count - 1; i++)
+                {
+                    strings.Add(split.Substring(indicesArray[i], indicesArray[i + 1] - indicesArray[i]));
+                }
+                foreach(var s in strings)
+                {
+                    bcvs.AddRange(this.ParseString2(s));
+                }
             }
             return bcvs;
         }
@@ -79,7 +104,7 @@ namespace MySermonsWPF.Data.Bible
             bool addedVerse = false;
 
             //ensure uniformity in parsing all strings: inblock separator must exist in all strings
-            toParse = toParse.EndsWith(SEPARATOR_INBLOCK.ToString()) ? toParse : toParse + SEPARATOR_INBLOCK;
+            toParse += SEPARATOR_INBLOCK;
             var splits = toParse.Split(new char[] { SEPARATOR_INBLOCK }, System.StringSplitOptions.RemoveEmptyEntries);
             foreach (var split in splits)
             {
