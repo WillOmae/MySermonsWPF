@@ -30,14 +30,14 @@ namespace MySermonsWPF.UI
         /// Convert the RichTextBox text into rich text in a specified format (currently rtf).
         /// </summary>
         /// <returns>A string representation of the rich text.</returns>
-        public string GetRichText()
+        public string GetRichText(string dataFormat)
         {
             TextRange textRange = new TextRange(this.rtb.Document.ContentStart, this.rtb.Document.ContentEnd);
             if(textRange.Text.Trim().Length > 0)
             {
                 using(var stream = new MemoryStream())
                 {
-                    textRange.Save(stream, DataFormats.Rtf);
+                    textRange.Save(stream, dataFormat);
                     this.ResetStream(stream);
                     StringBuilder stringBuilder = new StringBuilder();
                     int b;
@@ -58,14 +58,14 @@ namespace MySermonsWPF.UI
         /// Sets the RichTextBox text from rich text in a specified format (currently rtf).
         /// </summary>
         /// <param name="richText">The string representation of the rich text.</param>
-        public void SetRichText(string richText)
+        public void SetRichText(string richText, string dataFormat)
         {
             if(!string.IsNullOrEmpty(richText))
             {
                 using(Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(richText)))
                 {
                     TextRange textRange = new TextRange(this.rtb.Document.ContentStart, this.rtb.Document.ContentEnd);
-                    textRange.Load(stream, DataFormats.Rtf);
+                    textRange.Load(stream, dataFormat);
                 }
             }
         }

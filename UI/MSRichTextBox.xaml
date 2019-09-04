@@ -516,7 +516,8 @@
             </Button>
         </Grid>
         <RichTextBox x:Name="BaseRichTextBox"
-                     GotFocus="BaseRichTextBox_GotFocus">
+                     GotFocus="BaseRichTextBox_GotFocus"
+                     TextChanged="BaseRichTextBox_TextChanged">
 
         </RichTextBox>
     </DockPanel>

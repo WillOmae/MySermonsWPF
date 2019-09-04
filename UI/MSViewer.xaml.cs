@@ -36,11 +36,11 @@ namespace MySermonsWPF.UI
         {
             get
             {
-                return this.documentManager.GetRichText();
+                return this.documentManager.GetRichText(DataFormats.Rtf);
             }
             private set
             {
-                this.documentManager.SetRichText(value);
+                this.documentManager.SetRichText(value, DataFormats.Rtf);
             }
         }
         /// <summary>

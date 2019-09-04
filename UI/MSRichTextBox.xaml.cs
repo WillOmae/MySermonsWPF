@@ -25,6 +25,34 @@ namespace MySermonsWPF.UI
         private BitmapImage openIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/expand.png"));
         private string closePanelTooltip = "Close details panel.";
         private string openPanelTooltip = "Open details panel";
+        /// <summary>
+        /// Single chapter e.g. Hebrews 1
+        /// </summary>
+        private const string regexBC = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}";
+        /// <summary>
+        /// Single verse e.g. Hebrews 11:1
+        /// </summary>
+        private const string regexBCV = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*:\s*\d{1,3}";
+        /// <summary>
+        /// Range of verses within a chapter e.g. Psalms 119:105 - 150
+        /// </summary>
+        private const string regexBCVrV = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*:\s*\d{1,3}\s*-\s*\d{1,3}";
+        /// <summary>
+        /// Range of chapters within the same book e.g. 1John 1 - 3
+        /// </summary>
+        private const string regexBCrC = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*-\s*\d{1,3}";
+        /// <summary>
+        /// Range of verses across chapters of the same book e.g. Revelation 20:10 - 21:10
+        /// </summary>
+        private const string regexBCVrCV = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*:\s*\d{1,3}-\s*\d{1,3}\s*:\s*\d{1,3}";
+        /// <summary>
+        /// Range of chapters across books e.g. 2John 1 - 3John 1
+        /// </summary>
+        private const string regexBCrBC = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*-\d?\s*[a-zA-Z]{1,}\s*\d{1,3}";
+        /// <summary>
+        /// Range of verses across chapters across books e.g. 2John 1:1 - 3John 1:3
+        /// </summary>
+        private const string regexBCVrBCV = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*:\s*\d{1,3}-\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*:\s*\d{1,3}";
 
         /// <summary>
         /// Constructor accepting a parameter of type sermon.
@@ -203,7 +231,7 @@ namespace MySermonsWPF.UI
             this.MetaLocation.Text = this.sermon.Location.Name == "LOCATION_NOT_SET" ? string.Empty : this.sermon.Location.Name;
             this.MetaThemes.Text = themes;
             this.MetaOtherInfo.Text = this.sermon.OtherMetaData == "OTHER_METADATA_NOT_SET" ? string.Empty : this.sermon.OtherMetaData;
-            this.documentManager.SetRichText(this.sermon.Content == "CONTENT_NOT_SET" ? string.Empty : this.sermon.Content);
+            this.documentManager.SetRichText(this.sermon.Content == "CONTENT_NOT_SET" ? string.Empty : this.sermon.Content, DataFormats.Rtf);
         }
 
         private void Save()
@@ -219,7 +247,7 @@ namespace MySermonsWPF.UI
                 char themeDelimiter = ',';
                 Location location = string.IsNullOrEmpty(this.MetaLocation.Text) ? null : new Location(this.MetaLocation.Text, StringType.Name);
                 List<Theme> themes = string.IsNullOrEmpty(this.MetaThemes.Text) ? null : Theme.ExtractFromDelimitedString(this.MetaThemes.Text, themeDelimiter);
-                string content = this.documentManager.IsEmpty() ? null : this.documentManager.GetRichText();
+                string content = this.documentManager.IsEmpty() ? null : this.documentManager.GetRichText(DataFormats.Rtf);
                 string title = string.IsNullOrEmpty(this.MetaTitle.Text) ? null : this.MetaTitle.Text;
                 string keyText = string.IsNullOrEmpty(this.MetaKeyText.Text) ? null : this.MetaKeyText.Text;
                 string otherMetadata = string.IsNullOrEmpty(this.MetaOtherInfo.Text) ? null : this.MetaOtherInfo.Text;
@@ -245,6 +273,18 @@ namespace MySermonsWPF.UI
         private enum MetadataPanelToggle
         {
             Open, Close
+        }
+
+        private void BaseRichTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            foreach(var arg in e.Changes)
+            {
+                if (arg.AddedLength > 0)
+                {
+                    string rtbText = documentManager.GetRichText(DataFormats.Text);
+                    rtbText.ToString();
+                }
+            }
         }
     }
 }
