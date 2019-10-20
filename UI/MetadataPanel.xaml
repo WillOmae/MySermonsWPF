@@ -1,0 +1,163 @@
+﻿<UserControl x:Class="MySermonsWPF.UI.MetadataPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MySermonsWPF.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="200">
+    <UserControl.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+        <VisualBrush x:Key="TitleBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+            <VisualBrush.Visual>
+                <Label Content="title" Foreground="LightGray" />
+            </VisualBrush.Visual>
+        </VisualBrush>
+        <VisualBrush x:Key="SpeakerBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+            <VisualBrush.Visual>
+                <Label Content="speaker" Foreground="LightGray" />
+            </VisualBrush.Visual>
+        </VisualBrush>
+        <VisualBrush x:Key="KeyTextBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+            <VisualBrush.Visual>
+                <Label Content="key text" Foreground="LightGray" />
+            </VisualBrush.Visual>
+        </VisualBrush>
+        <VisualBrush x:Key="LocationBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+            <VisualBrush.Visual>
+                <Label Content="location" Foreground="LightGray" />
+            </VisualBrush.Visual>
+        </VisualBrush>
+        <VisualBrush x:Key="ThemesBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+            <VisualBrush.Visual>
+                <Label Content="themes" Foreground="LightGray" />
+            </VisualBrush.Visual>
+        </VisualBrush>
+        <VisualBrush x:Key="OtherBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+            <VisualBrush.Visual>
+                <Label Content="other info" Foreground="LightGray" />
+            </VisualBrush.Visual>
+        </VisualBrush>
+    </UserControl.Resources>
+    <StackPanel Orientation="Vertical">
+        <TextBox x:Name="MetaTitle">
+            <TextBox.Style>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter Property="Background" Value="{StaticResource TitleBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource TitleBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <TextBox x:Name="MetaSpeaker">
+            <TextBox.Style>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter Property="Background" Value="{StaticResource SpeakerBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource SpeakerBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <TextBox x:Name="MetaKeyText">
+            <TextBox.Style>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter Property="Background" Value="{StaticResource KeyTextBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource KeyTextBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <TextBox x:Name="MetaLocation">
+            <TextBox.Style>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter Property="Background" Value="{StaticResource LocationBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource LocationBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <TextBox x:Name="MetaThemes">
+            <TextBox.Style>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter Property="Background" Value="{StaticResource ThemesBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource ThemesBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <TextBox x:Name="MetaOtherInfo">
+            <TextBox.Style>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter Property="Background" Value="{StaticResource OtherBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource OtherBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+    </StackPanel>
+</UserControl>
