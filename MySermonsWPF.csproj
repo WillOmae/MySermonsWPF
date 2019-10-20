@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\EntityFramework.6.3.0\build\EntityFramework.props" Condition="Exists('packages\EntityFramework.6.3.0\build\EntityFramework.props')" />
   <Import Project="packages\NUnit.3.12.0\build\NUnit.props" Condition="Exists('packages\NUnit.3.12.0\build\NUnit.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -40,10 +41,10 @@
       <HintPath>packages\DiffPlex.1.4.4\lib\net40\DiffPlex.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>packages\EntityFramework.6.3.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>packages\EntityFramework.6.3.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="nunit.framework, Version=3.12.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
@@ -51,6 +52,30 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Syncfusion.Compression.Base, Version=17.3450.0.17, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89, processorArchitecture=MSIL">
+      <HintPath>packages\Syncfusion.Compression.Base.17.3.0.17\lib\net45\Syncfusion.Compression.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.DocIO.Base, Version=17.3450.0.17, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89, processorArchitecture=MSIL">
+      <HintPath>packages\Syncfusion.DocIO.Wpf.17.3.0.17\lib\net45\Syncfusion.DocIO.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Licensing, Version=17.3450.0.17, Culture=neutral, PublicKeyToken=632609b4d040f6b4, processorArchitecture=MSIL">
+      <HintPath>packages\Syncfusion.Licensing.17.3.0.17\lib\net45\Syncfusion.Licensing.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.OfficeChart.Base, Version=17.3450.0.17, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89, processorArchitecture=MSIL">
+      <HintPath>packages\Syncfusion.OfficeChart.Base.17.3.0.17\lib\net45\Syncfusion.OfficeChart.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfRichTextBoxAdv.WPF, Version=17.3450.0.17, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89, processorArchitecture=MSIL">
+      <HintPath>packages\Syncfusion.SfRichTextBoxAdv.WPF.17.3.0.17\lib\net45\Syncfusion.SfRichTextBoxAdv.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfRichTextRibbon.WPF, Version=17.3450.0.17, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89, processorArchitecture=MSIL">
+      <HintPath>packages\Syncfusion.SfRichTextRibbon.WPF.17.3.0.17\lib\net45\Syncfusion.SfRichTextRibbon.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Shared.WPF, Version=17.3450.0.17, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89, processorArchitecture=MSIL">
+      <HintPath>packages\Syncfusion.Shared.WPF.17.3.0.17\lib\net45\Syncfusion.Shared.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Tools.WPF, Version=17.3450.0.17, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89, processorArchitecture=MSIL">
+      <HintPath>packages\Syncfusion.Tools.WPF.17.3.0.17\lib\net45\Syncfusion.Tools.WPF.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -67,6 +92,9 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
@@ -77,6 +105,78 @@
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
     <Content Include="Data\Bible\BibleXml.xml" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Clipboard\Print32.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Clipboard\Redo16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Clipboard\Undo16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Clipboard\Plain16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Save32.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Clipboard\Copy16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Clipboard\Cut16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Clipboard\Paste16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Clipboard\Paste32.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Editing\Find.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Editing\Replace.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Editing\RestrictEditing.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Editing\Select.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Font\Bold16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Font\FontDialog.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Font\Fonts16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Font\GrowFont16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Font\HighlightColor16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Font\Italic16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Font\ShrinkFont16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Font\Strikethrough16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Font\Subscript16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Font\Superscript16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Font\Underline16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\AlignTextCenter16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\AlignTextJustify16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\AlignTextLeft16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\AlignTextRight16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Bullets16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Bullets\Bullet_Arrow.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Bullets\Bullet_Circle.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Bullets\Bullet_Dot.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Bullets\Bullet_Flower.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Bullets\Bullet_Image.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Bullets\Bullet_None.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Bullets\Bullet_Square.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Bullets\Bullet_Tick.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\DecreaseIndent16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\IncreaseIndent16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\LineSpacing16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\List16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\List\List_Bullets.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\List\List_Multilevel.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\List\List_Normal.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Numbering16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Numbering\Numbering_LowLetter_Brace.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Numbering\Numbering_LowLetter_Dot.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Numbering\Numbering_LowRoman.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Numbering\Numbering_None.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Numbering\Numbering_Number_Brace.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Numbering\Numbering_Number_Dot.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Numbering\Numbering_UpLetter.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\Numbering\Numbering_UpRoman.png" />
+    <Resource Include="UI\Resources\RibbonImages\Home\Paragraph\ParagraphDialog.png" />
+    <Resource Include="UI\Resources\RibbonImages\Insert\Hyperlink32.png" />
+    <Resource Include="UI\Resources\RibbonImages\Insert\Picture32.png" />
+    <Resource Include="UI\Resources\RibbonImages\Insert\Table16.png" />
+    <Resource Include="UI\Resources\RibbonImages\Insert\Table32.png" />
+    <Resource Include="UI\Resources\RibbonImages\Review\DeleteComment.png" />
+    <Resource Include="UI\Resources\RibbonImages\Review\NewComment.png" />
+    <Resource Include="UI\Resources\RibbonImages\Review\NextComment.png" />
+    <Resource Include="UI\Resources\RibbonImages\Review\PreviousComment.png" />
+    <Resource Include="UI\Resources\RibbonImages\Review\ShowComments.png" />
+    <Resource Include="UI\Resources\RibbonImages\Review\Spelling.png" />
+    <Resource Include="UI\Resources\RibbonImages\View\FlowLayout.png" />
+    <Resource Include="UI\Resources\RibbonImages\View\MultiplePages.png" />
+    <Resource Include="UI\Resources\RibbonImages\View\OnePage.png" />
+    <Resource Include="UI\Resources\RibbonImages\View\PageLayout.png" />
+    <Resource Include="UI\Resources\RibbonImages\View\PageWidth.png" />
+    <Resource Include="UI\Resources\RibbonImages\View\ResetZoom.png" />
+    <Resource Include="UI\Resources\RibbonImages\View\ZoomIn.png" />
+    <Resource Include="UI\Resources\RibbonImages\View\ZoomOut.png" />
     <Resource Include="UI\Resources\collapse.png" />
     <Resource Include="UI\Resources\expand.png" />
     <Resource Include="UI\Resources\Formatbar\close2.png" />
@@ -152,9 +252,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI\MetadataPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\MSRichTextBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\MSRichTextBoxAdv.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\MSTabControl.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -220,8 +328,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="UI\Binding\Converters.cs" />
     <Compile Include="UI\Commands\CustomCommands.cs">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\MetadataPanel.xaml.cs">
+      <DependentUpon>MetadataPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MSDocumentManager.cs">
       <SubType>Code</SubType>
@@ -233,6 +345,9 @@
     <Compile Include="UI\MSRichTextBox.xaml.cs">
       <DependentUpon>MSRichTextBox.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\MSRichTextBoxAdv.xaml.cs">
+      <DependentUpon>MSRichTextBoxAdv.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MSTabControl.xaml.cs">
       <DependentUpon>MSTabControl.xaml</DependentUpon>
@@ -278,6 +393,9 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\NUnit.3.12.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\NUnit.3.12.0\build\NUnit.props'))" />
     <Error Condition="!Exists('packages\System.Data.SQLite.Core.1.0.111.0\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\System.Data.SQLite.Core.1.0.111.0\build\net45\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('packages\EntityFramework.6.3.0\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.3.0\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('packages\EntityFramework.6.3.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.3.0\build\EntityFramework.targets'))" />
   </Target>
   <Import Project="packages\System.Data.SQLite.Core.1.0.111.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('packages\System.Data.SQLite.Core.1.0.111.0\build\net45\System.Data.SQLite.Core.targets')" />
+  <Import Project="packages\EntityFramework.6.3.0\build\EntityFramework.targets" Condition="Exists('packages\EntityFramework.6.3.0\build\EntityFramework.targets')" />
 </Project>
