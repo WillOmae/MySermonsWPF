@@ -10,6 +10,7 @@
              mc:Ignorable="d" 
              Loaded="MSRichTextBoxLoaded"
              d:DesignHeight="450" d:DesignWidth="800">
+    
     <UserControl.Resources>
         <syncfusion:FontFamilyStringConverter x:Key="FontFamilyStringConverter"/>
         <syncfusion:LeftAlignmentToggleConverter x:Key="LeftAlignmentToggleConverter"/>
@@ -28,6 +29,19 @@
         <converters:PercentageDoubleConverter x:Key="PercentageDoubleConverter" />
         <converters:PercentageStringConverter x:Key="PercentageStringConverter" />
     </UserControl.Resources>
+
+    <UserControl.CommandBindings>
+        <CommandBinding Command="Save"
+                        CanExecute="SaveCommandCanExecute"
+                        Executed="SaveCommandExecuted"/>
+        <CommandBinding Command="Print"
+                        CanExecute="PrintCommandCanExecute"
+                        Executed="PrintCommandExecuted"/>
+        <CommandBinding Command="commands:CustomCommands.PastePlain"
+                        CanExecute="PastePlainCommandCanExecute"
+                        Executed="PastePlainCommandExecuted"/>
+    </UserControl.CommandBindings>
+    
     <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Left"
                     Orientation="Horizontal">
@@ -93,7 +107,7 @@
                             </syncfusion:ScreenTip>
                         </syncfusion:RibbonButton.ToolTip>
                     </syncfusion:RibbonButton>
-                    <syncfusion:RibbonButton Margin="3" SizeForm="ExtraSmall" ToolTipService.ShowOnDisabled="True" Label="Undo" HorizontalAlignment="Left" IsToggle="False" SmallIcon="Resources/RibbonImages/Home/Clipboard/Undo16.png" Command="ApplicationCommands.Undo">
+                    <syncfusion:RibbonButton Margin="3" SizeForm="ExtraSmall" ToolTipService.ShowOnDisabled="True" Label="Undo" HorizontalAlignment="Left" IsToggle="False" SmallIcon="Resources/RibbonImages/Home/Clipboard/Undo16.png" Command="syncfusion:SfRichTextBoxAdv.UndoCommand">
                         <syncfusion:RibbonButton.ToolTip>
                             <syncfusion:ScreenTip Description="UndoToolTipHeader">
                                 <StackPanel>
@@ -102,7 +116,7 @@
                             </syncfusion:ScreenTip>
                         </syncfusion:RibbonButton.ToolTip>
                     </syncfusion:RibbonButton>
-                    <syncfusion:RibbonButton Margin="3" SizeForm="ExtraSmall" ToolTipService.ShowOnDisabled="True" Label="Redo" HorizontalAlignment="Left" IsToggle="False" SmallIcon="Resources/RibbonImages/Home/Clipboard/Redo16.png" Command="ApplicationCommands.Redo">
+                    <syncfusion:RibbonButton Margin="3" SizeForm="ExtraSmall" ToolTipService.ShowOnDisabled="True" Label="Redo" HorizontalAlignment="Left" IsToggle="False" SmallIcon="Resources/RibbonImages/Home/Clipboard/Redo16.png" Command="syncfusion:SfRichTextBoxAdv.RedoCommand">
                         <syncfusion:RibbonButton.ToolTip>
                             <syncfusion:ScreenTip Description="RedoToolTipHeader">
                                 <StackPanel>
@@ -776,6 +790,5 @@
         <syncfusion:SfRichTextBoxAdv
             x:Name="BaseRichTextBox"
             GotFocus="BaseRichTextBox_GotFocus"/>
-
     </DockPanel>
 </UserControl>

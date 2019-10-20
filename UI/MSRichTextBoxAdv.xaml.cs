@@ -127,6 +127,22 @@ namespace MySermonsWPF.UI
         {
             e.CanExecute = true;
         }
+        private void PrintCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("printing...");
+        }
+        private void PrintCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+        private void PastePlainCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            //this.documentManager.Insert(Clipboard.GetText());
+        }
+        private void PastePlainCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Clipboard.ContainsText();
+        }
         private void BaseRichTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             this.ToggleMetadataPanelOpening(MetadataPanelToggle.Close);
