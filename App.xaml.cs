@@ -13,6 +13,9 @@ namespace MySermonsWPF
     /// </summary>
     public partial class App : Application
     {
-
+        public App()
+        {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MTU5Njc0QDMxMzcyZTMzMmUzMG5mVjNXeldUWmp4MjFaaHZnZitXU25za2hPSHR2YW5yWGFYbVF2M1FaREk9");
+        }
     }
 }
