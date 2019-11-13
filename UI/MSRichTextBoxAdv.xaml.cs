@@ -1,15 +1,12 @@
-﻿using DiffPlex;
-using DiffPlex.DiffBuilder;
-using DiffPlex.DiffBuilder.Model;
-using MySermonsWPF.Data;
+﻿using MySermonsWPF.Data;
+using MySermonsWPF.Data.Bible;
 using Syncfusion.Windows.Controls.RichTextBoxAdv;
+using Syncfusion.Windows.Controls.Tools;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -34,31 +31,34 @@ namespace MySermonsWPF.UI
         /// <summary>
         /// Single chapter e.g. Hebrews 1
         /// </summary>
-        private const string regexBC = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}";
+        private const string regexBC = @"\b(\d *)?[a-zA-Z]{1,} *\d{1,3}\b";
         /// <summary>
         /// Single verse e.g. Hebrews 11:1
         /// </summary>
-        private const string regexBCV = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*:\s*\d{1,3}";
+        private const string regexBCV = @"\b(\d *)?[a-zA-Z]{1,} *\d{1,3} *: *\d{1,3}\b";
         /// <summary>
         /// Range of verses within a chapter e.g. Psalms 119:105 - 150
         /// </summary>
-        private const string regexBCVrV = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*:\s*\d{1,3}\s*-\s*\d{1,3}";
+        private const string regexBCVrV = @"\b(\d *)?[a-zA-Z]{1,} *\d{1,3} *: *\d{1,3} *- *\d{1,3}\b";
         /// <summary>
         /// Range of chapters within the same book e.g. 1John 1 - 3
         /// </summary>
-        private const string regexBCrC = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*-\s*\d{1,3}";
+        private const string regexBCrC = @"\b(\d *)?[a-zA-Z]{1,} *\d{1,3} *- *\d{1,3}\b";
         /// <summary>
         /// Range of verses across chapters of the same book e.g. Revelation 20:10 - 21:10
         /// </summary>
-        private const string regexBCVrCV = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*:\s*\d{1,3}-\s*\d{1,3}\s*:\s*\d{1,3}";
+        private const string regexBCVrCV = @"\b(\d *)?[a-zA-Z]{1,} *\d{1,3} *: *\d{1,3}- *\d{1,3} *: *\d{1,3}\b";
         /// <summary>
         /// Range of chapters across books e.g. 2John 1 - 3John 1
         /// </summary>
-        private const string regexBCrBC = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*-\d?\s*[a-zA-Z]{1,}\s*\d{1,3}";
+        private const string regexBCrBC = @"\b(\d *)?[a-zA-Z]{1,} *\d{1,3} *-(\d *)?[a-zA-Z]{1,} *\d{1,3}\b";
         /// <summary>
         /// Range of verses across chapters across books e.g. 2John 1:1 - 3John 1:3
         /// </summary>
-        private const string regexBCVrBCV = @"\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*:\s*\d{1,3}-\d?\s*[a-zA-Z]{1,}\s*\d{1,3}\s*:\s*\d{1,3}";
+        private const string regexBCVrBCV = @"\b(\d *)?[a-zA-Z]{1,} *\d{1,3} *: *\d{1,3}-(\d *)?[a-zA-Z]{1,} *\d{1,3} *: *\d{1,3}\b";
+
+        private readonly Regex combinedRegex;
+        private readonly XmlBible xmlBible;
 
         /// <summary>
         /// Constructor accepting a parameter of type sermon.
@@ -68,6 +68,8 @@ namespace MySermonsWPF.UI
         {
             this.InitializeComponent();
             this.sermon = sermon;
+            this.xmlBible = new XmlBible();
+            this.combinedRegex = new Regex(regexBCVrBCV + "|" + regexBCrBC + "|" + regexBCVrCV + "|" + regexBCrC + "|" + regexBCVrV + "|" + regexBCV + "|" + regexBC, RegexOptions.Compiled);
         }
         /// <summary>
         /// Event handler when all controls have been loaded.
@@ -79,6 +81,106 @@ namespace MySermonsWPF.UI
             if (this.sermon != null)
             {
                 this.SetUpEditor();
+            }
+            BaseRichTextBox.KeyUp += this.BaseRichTextBox_KeyUp;
+            BaseRichTextBox.PreviewMouseLeftButtonUp += this.BaseRichTextBox_PreviewMouseLeftButtonUp;
+        }
+
+        private void BaseRichTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var position = e.GetPosition(BaseRichTextBox);
+        }
+        private void DetectVerses()
+        {
+            string text = GetRTBContents(FormatType.Txt);
+            var matches = combinedRegex.Matches(text);
+
+            foreach (Match match in matches)
+            {
+                var verses = xmlBible.Parse(match.Value);
+                if (verses != null)
+                {
+                    var positions = BaseRichTextBox.FindAll(match.Value, FindOptions.None);
+                    if (positions != null)
+                    {
+                        for (int i = 0; i < positions.Count; i++)
+                        {
+                            var position = positions[i];
+                            var hierarchicalIndex = position.Start.HierarchicalIndex;
+                            var splits = hierarchicalIndex.Split(';');
+                            var sectionIndex = int.Parse(splits[0]);
+                            var blockIndex = int.Parse(splits[1]);
+                            var inlineIndex = int.Parse(splits[2]);
+                            var section = BaseRichTextBox.Document.Sections[sectionIndex];
+
+                            if (section.Blocks[blockIndex] is ParagraphAdv paragraphAdv)
+                            {
+                                StringBuilder stringBuilder = new StringBuilder();
+                                foreach (Inline inline in paragraphAdv.Inlines)
+                                {
+                                    if (inline is SpanAdv inlineSpan)
+                                    {
+                                        stringBuilder.Append(inlineSpan.Text);
+                                    }
+                                }
+                                string posText = position.Text;
+                                int index = stringBuilder.ToString().IndexOf(posText);
+                                if (index != -1)
+                                {
+                                    int foundLength = 0;
+                                    string[] parts = posText.Split('-', ',', ' ', ';', ':');
+                                    int countTotal = 2 * parts.Length - 1;
+                                    for (int j = 0; j < paragraphAdv.Inlines.Count; j++)
+                                    {
+                                        if (paragraphAdv.Inlines[j] is SpanAdv inlineSpan)
+                                        {
+                                            foundLength += inlineSpan.Text.Length;
+                                            if (foundLength > index && foundLength <= (index + posText.Length))
+                                            {
+                                                paragraphAdv.Inlines.Insert(j++, new FieldBeginAdv());
+                                                paragraphAdv.Inlines.Insert(j++, new SpanAdv
+                                                {
+                                                    Text = " HYPERLINK \"" + posText + "\" "
+                                                });
+                                                paragraphAdv.Inlines.Insert(j++, new FieldSeparatorAdv());
+                                                SpanAdv fieldResult = new SpanAdv
+                                                {
+                                                    Text = posText
+                                                };
+                                                fieldResult.CharacterFormat.Underline = Underline.Single;
+                                                fieldResult.CharacterFormat.FontColor = Color.FromArgb(0xff, 0x05, 0x63, 0xc1);
+                                                paragraphAdv.Inlines.Insert(j++, fieldResult);
+                                                paragraphAdv.Inlines.Insert(j++, new FieldEndAdv());
+                                                for (int k = countTotal - 1; k >= 0 && (j + k) >= 0 && (j + k) < paragraphAdv.Inlines.Count; k--)
+                                                {
+                                                    paragraphAdv.Inlines.RemoveAt(j + k);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private void BaseRichTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.OemPeriod)
+            {
+                var currentStart = BaseRichTextBox.Selection.Start;
+                var currentEnd = BaseRichTextBox.Selection.End;
+
+                DetectVerses();
+
+                BaseRichTextBox.Selection.Select(currentStart, currentEnd);
+                e.Handled = true;
+            }
+            else
+            {
+                e.Handled = false;
             }
         }
         private string GetRTBContents(FormatType dataFormat)
@@ -222,7 +324,6 @@ namespace MySermonsWPF.UI
         {
             Open, Close
         }
-
         private void ExpandMetadataPanel_Click(object sender, RoutedEventArgs e)
         {
             switch (this.BaseMetadataPanel.Visibility)
