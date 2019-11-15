@@ -1,19 +1,20 @@
-﻿using MySermonsWPF.Data;
+﻿using DiffPlex;
+using DiffPlex.Model;
+using MySermonsWPF.Data;
 using MySermonsWPF.Data.Bible;
 using Syncfusion.Windows.Controls.RichTextBoxAdv;
-using Syncfusion.Windows.Controls.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using DiffPlex;
-using DiffPlex.Model;
 
 namespace MySermonsWPF.UI
 {
@@ -59,13 +60,13 @@ namespace MySermonsWPF.UI
         /// </summary>
         private const string regexBCVrBCV = @"\b(\d *)?[a-zA-Z]{1,} *\d{1,3} *: *\d{1,3}-(\d *)?[a-zA-Z]{1,} *\d{1,3} *: *\d{1,3}\b";
 
-
         private readonly bool? verseBold = true;
         private readonly Underline? verseUnderline = Underline.Single;
         private readonly Color? verseColor = Color.FromArgb(0xff, 0x05, 0x63, 0xc1);
 
         private readonly Regex combinedRegex;
         private readonly XmlBible xmlBible;
+        private readonly Differ differ;
 
         private Point lastMousePosition = new Point(-1, -1);
         private string lastStringComposition = string.Empty;
@@ -79,6 +80,7 @@ namespace MySermonsWPF.UI
             this.InitializeComponent();
             this.sermon = sermon;
             this.xmlBible = new XmlBible();
+            this.differ = new Differ();
             this.combinedRegex = new Regex(regexBCVrBCV + "|" + regexBCrBC + "|" + regexBCVrCV + "|" + regexBCrC + "|" + regexBCVrV + "|" + regexBCV + "|" + regexBC, RegexOptions.Compiled);
         }
         /// <summary>
@@ -94,12 +96,12 @@ namespace MySermonsWPF.UI
             }
             BaseRichTextBox.KeyUp += this.BaseRichTextBox_KeyUp;
             BaseRichTextBox.PreviewMouseLeftButtonUp += this.BaseRichTextBox_PreviewMouseLeftButtonUp;
-            //BaseRichTextBox.PreviewMouseMove += this.BaseRichTextBox_PreviewMouseMove;
+            BaseRichTextBox.PreviewMouseMove += this.BaseRichTextBox_PreviewMouseMove;
         }
 
         private void BaseRichTextBox_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            var current = BaseRichTextBox.Selection.Start;
+            string current = BaseRichTextBox.Selection.Start.HierarchicalIndex;
             Point mousePoint = Mouse.GetPosition(BaseRichTextBox);
             if (lastMousePosition.Equals(mousePoint))
                 return;
@@ -148,7 +150,8 @@ namespace MySermonsWPF.UI
             }
 
             // Reset the cursor position to last user editing position.
-            BaseRichTextBox.Selection.Select(current, current);
+            TextPosition truePos = BaseRichTextBox.Document.GetTextPosition(current);
+            BaseRichTextBox.Selection.Select(truePos, truePos);
             BaseRichTextBox.ReleaseMouseCapture();
             BaseRichTextBox.Focus();
         }
@@ -160,75 +163,65 @@ namespace MySermonsWPF.UI
         private void DetectVerses()
         {
             string currStringComposition = this.GetRTBContents(FormatType.Txt);
-            Differ differ = new Differ();
-            DiffResult diffResults = differ.CreateCharacterDiffs(lastStringComposition, currStringComposition, false);
-            if (diffResults.DiffBlocks.Count > 0)
+            DiffResult diffResults = differ.CreateCharacterDiffs(lastStringComposition, currStringComposition, true);
+            lastStringComposition = currStringComposition;
+            foreach (DiffBlock diffResult in diffResults.DiffBlocks.Where(diffResult => diffResult.InsertCountB > 0).Select(diffResult => diffResult))
             {
-                for (int blockCount = 0; blockCount < diffResults.DiffBlocks.Count; blockCount++)
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int diffIndex = diffResult.InsertStartB; diffIndex < diffResult.InsertStartB + diffResult.InsertCountB; diffIndex++)
                 {
-                    DiffBlock diffResult = diffResults.DiffBlocks[blockCount];
-                    if (diffResult.InsertCountB != 0)
-                    {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        for (int diffIndex = diffResult.InsertStartB; diffIndex < diffResult.InsertStartB + diffResult.InsertCountB; diffIndex++)
-                        {
-                            stringBuilder.Append(diffResults.PiecesNew[diffIndex]);
-                        }
-                        string insertedText = stringBuilder.ToString();
-                        var matches = this.combinedRegex.Matches(insertedText);
+                    stringBuilder.Append(diffResults.PiecesNew[diffIndex]);
+                }
 
-                        foreach (Match match in matches)
-                        {
-                            if (this.xmlBible.Parse(match.Value) != null)
-                            {
-                                var positions = BaseRichTextBox.FindAll(match.Value, FindOptions.None);
-                                if (positions != null)
-                                {
-                                    for (int posCount = 0; posCount < positions.Count; posCount++)
-                                    {
-                                        var position = positions[posCount];
-                                        if (position != null)
-                                        {
-                                            TextPosition start = position.Start;
-                                            TextPosition end = position.End;
-                                            if (start.Paragraph.Equals(end.Paragraph))
-                                            {
-                                                int inlineIndex = int.Parse(start.HierarchicalIndex.Split(';')[2]);
-                                                ParagraphAdv paragraphAdv = start.Paragraph;
-                                                BaseRichTextBox.Selection.Select(start, end);
-                                                bool? initialBold = BaseRichTextBox.Selection.CharacterFormat.Bold;
-                                                Underline? initialUnderline = BaseRichTextBox.Selection.CharacterFormat.Underline;
-                                                Color? initialColor = BaseRichTextBox.Selection.CharacterFormat.FontColor;
-                                                BaseRichTextBox.Selection.CharacterFormat.Bold = verseBold;
-                                                BaseRichTextBox.Selection.CharacterFormat.Underline = verseUnderline;
-                                                BaseRichTextBox.Selection.CharacterFormat.FontColor = verseColor;
-                                                BaseRichTextBox.Selection.Select(end, end);
-                                                BaseRichTextBox.Selection.CharacterFormat.Bold = initialBold;
-                                                BaseRichTextBox.Selection.CharacterFormat.Underline = initialUnderline;
-                                                BaseRichTextBox.Selection.CharacterFormat.FontColor = initialColor;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                MatchCollection matches = this.combinedRegex.Matches(stringBuilder.ToString());
+                if (matches == null) continue;
+                foreach (Match match in matches)
+                {
+                    if (match == null) continue;
+                    List<BibleVerse> list = this.xmlBible.Parse(match.Value);
+                    if (list == null && list.Count < 1) continue;
+                    string currentStart = string.Empty;
+                    TextSearchResults positions = null;
+                    BaseRichTextBox.Dispatcher.Invoke(() =>
+                    {
+                        currentStart = BaseRichTextBox.Selection.Start.HierarchicalIndex;
+                        positions = BaseRichTextBox.FindAll(match.Value, FindOptions.CaseSensitiveWholeWord);
+                    });
+                    if (positions == null) continue;
+                    for (int posCount = 0; posCount < positions.Count; posCount++)
+                    {
+                        TextSearchResult position = positions[posCount];
+                        string start = position.Start.HierarchicalIndex;
+                        string end = position.End.HierarchicalIndex;
+                        this.BaseRichTextBox.Dispatcher.BeginInvoke((FormatAsVerseDelegate)this.FormatAsVerse, start, end, currentStart);
                     }
                 }
-                lastStringComposition = currStringComposition;
-                return;
             }
+        }
+        delegate void FormatAsVerseDelegate(string start, string end, string cursorPos);
+        private void FormatAsVerse(string startPos, string endPos, string cursorPos)
+        {
+            TextPosition start = BaseRichTextBox.Document.GetTextPosition(startPos);
+            TextPosition end = BaseRichTextBox.Document.GetTextPosition(endPos);
+            BaseRichTextBox.Selection.Select(start, end);
+            BaseRichTextBox.Selection.CharacterFormat.Bold = verseBold;
+            BaseRichTextBox.Selection.CharacterFormat.Underline = verseUnderline;
+            BaseRichTextBox.Selection.CharacterFormat.FontColor = verseColor;
+
+            TextPosition textPosition = BaseRichTextBox.Document.GetTextPosition(cursorPos);
+            BaseRichTextBox.Selection.Select(textPosition, textPosition);
         }
         private void BaseRichTextBox_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.OemPeriod)
             {
                 e.Handled = true;
-                var currentStart = BaseRichTextBox.Selection.Start.HierarchicalIndex;
 
-                DetectVerses();
-
-                TextPosition textPosition = BaseRichTextBox.Document.GetTextPosition(currentStart);
-                BaseRichTextBox.Selection.Select(textPosition, textPosition);
+                Thread thread = new Thread(new ThreadStart(DetectVerses))
+                {
+                    IsBackground = true
+                };
+                thread.Start();
             }
             else
             {
