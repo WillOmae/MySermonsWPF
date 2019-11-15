@@ -66,14 +66,14 @@ namespace MySermonsWPF.UI
                                 }
                             }
                             // prevent duplicate editors
-                            else if(tabItem.Content is MSRichTextBox richTextBox)
+                            else if (tabItem.Content is MSRichTextBoxAdv richTextBox)
                             {
                                 var sermon = richTextBox.GetSermon();
                                 ItemCollection collection = this.BaseTabControl.Items;
                                 var found = (from TabItem collectionItem in collection
-                                             where (collectionItem.Content as MSRichTextBox) != null && (collectionItem.Content as MSRichTextBox).GetSermon() != null && (collectionItem.Content as MSRichTextBox).GetSermon().Equals(sermon)
+                                             where (collectionItem.Content as MSRichTextBoxAdv) != null && (collectionItem.Content as MSRichTextBoxAdv).GetSermon() != null && (collectionItem.Content as MSRichTextBoxAdv).GetSermon().Equals(sermon)
                                              select collectionItem).FirstOrDefault();
-                                if(found != null)
+                                if (found != null)
                                 {
                                     this.Items.Remove(tabItem);
                                     BaseTabControl.SelectedItem = found;

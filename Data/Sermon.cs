@@ -27,7 +27,7 @@ namespace MySermonsWPF.Data
         {
             get
             {
-                if(string.IsNullOrEmpty(this.guid))
+                if (string.IsNullOrEmpty(this.guid))
                 {
                     this.guid = Guid.NewGuid().ToString();
                 }
@@ -41,7 +41,7 @@ namespace MySermonsWPF.Data
         {
             get
             {
-                if(string.IsNullOrEmpty(this.title))
+                if (string.IsNullOrEmpty(this.title))
                 {
                     this.title = "TITLE_NOT_SET";
                 }
@@ -55,11 +55,11 @@ namespace MySermonsWPF.Data
         {
             get
             {
-                if(this.location == null)
+                if (this.location == null)
                 {
-                    if(this.locationId != -1)
+                    if (this.locationId != -1)
                         this.location = new Location(this.locationId);
-                    else if(!string.IsNullOrEmpty(this.locationName))
+                    else if (!string.IsNullOrEmpty(this.locationName))
                         this.location = new Location(this.locationName, StringType.Name);
 
                     this.locationId = this.location.ID;
@@ -75,7 +75,7 @@ namespace MySermonsWPF.Data
         {
             get
             {
-                if(this.dateCreated == -1)
+                if (this.dateCreated == -1)
                     this.dateCreated = DateTime.Now.Ticks;
                 return new DateTime(this.dateCreated);
             }
@@ -87,7 +87,7 @@ namespace MySermonsWPF.Data
         {
             get
             {
-                if(this.lastAccessed == -1)
+                if (this.lastAccessed == -1)
                     this.lastAccessed = DateTime.Now.Ticks;
                 return new DateTime(this.lastAccessed);
             }
@@ -103,7 +103,7 @@ namespace MySermonsWPF.Data
         {
             get
             {
-                if(string.IsNullOrEmpty(this.keyVerse))
+                if (string.IsNullOrEmpty(this.keyVerse))
                 {
                     this.keyVerse = "KEY_VERSE_NOT_SET";
                 }
@@ -117,7 +117,7 @@ namespace MySermonsWPF.Data
         {
             get
             {
-                if(string.IsNullOrEmpty(this.otherMetadata))
+                if (string.IsNullOrEmpty(this.otherMetadata))
                 {
                     this.otherMetadata = "OTHER_METADATA_NOT_SET";
                 }
@@ -131,7 +131,7 @@ namespace MySermonsWPF.Data
         {
             get
             {
-                if(string.IsNullOrEmpty(this.content))
+                if (string.IsNullOrEmpty(this.content))
                 {
                     this.content = "CONTENT_NOT_SET";
                 }
@@ -145,7 +145,7 @@ namespace MySermonsWPF.Data
         {
             get
             {
-                if(this.themes == null)
+                if (this.themes == null)
                 {
                     this.themes = Theme.GetSermonThemes(this.ID);
                 }
@@ -154,6 +154,24 @@ namespace MySermonsWPF.Data
             set
             {
                 this.themes = value;
+            }
+        }
+        /// <summary>
+        /// The speakers.
+        /// </summary>
+        public List<Speaker> Speakers
+        {
+            get
+            {
+                if (this.speakers == null)
+                {
+                    this.speakers = Speaker.GetSermonSpeakers(this.ID);
+                }
+                return this.speakers;
+            }
+            set
+            {
+                this.speakers = value;
             }
         }
 
@@ -205,6 +223,10 @@ namespace MySermonsWPF.Data
         /// The themes. null means it has not been set.
         /// </summary>
         private List<Theme> themes = null;
+        /// <summary>
+        /// The speakers. null means it has not been set.
+        /// </summary>
+        private List<Speaker> speakers = null;
 
         /// <summary>
         /// The default select statement.
@@ -239,7 +261,7 @@ namespace MySermonsWPF.Data
         public Sermon(long id)
         {
             Sermon sermon = Read(id);
-            this.CommonInit(sermon.ID, sermon.GUID, sermon.Title, sermon.Location.ID, sermon.Location.Name, sermon.Location, sermon.Themes, sermon.DateCreated.Ticks, sermon.DateLastAccessed.Ticks, sermon.KeyVerse, sermon.OtherMetaData, sermon.Content);
+            this.CommonInit(sermon.ID, sermon.GUID, sermon.Title, sermon.Location.ID, sermon.Location.Name, sermon.Location, sermon.Themes, sermon.Speakers, sermon.DateCreated.Ticks, sermon.DateLastAccessed.Ticks, sermon.KeyVerse, sermon.OtherMetaData, sermon.Content);
         }
 
         /// <summary>
@@ -249,7 +271,7 @@ namespace MySermonsWPF.Data
         public Sermon(string guid)
         {
             Sermon sermon = Read(guid);
-            this.CommonInit(sermon.ID, sermon.GUID, sermon.Title, sermon.Location.ID, sermon.Location.Name, sermon.Location, sermon.Themes, sermon.DateCreated.Ticks, sermon.DateLastAccessed.Ticks, sermon.KeyVerse, sermon.OtherMetaData, sermon.Content);
+            this.CommonInit(sermon.ID, sermon.GUID, sermon.Title, sermon.Location.ID, sermon.Location.Name, sermon.Location, sermon.Themes, sermon.Speakers, sermon.DateCreated.Ticks, sermon.DateLastAccessed.Ticks, sermon.KeyVerse, sermon.OtherMetaData, sermon.Content);
         }
 
         /// <summary>
@@ -260,9 +282,9 @@ namespace MySermonsWPF.Data
         /// <param name="keyVerse">The key verse of the sermon.</param>
         /// <param name="otherMetadata">Other metadata.</param>
         /// <param name="content">The content of the sermon.</param>
-        public Sermon(string title, Location location, List<Theme> themes, string keyVerse, string otherMetadata, string content)
+        public Sermon(string title, Location location, List<Theme> themes, List<Speaker> speakers, string keyVerse, string otherMetadata, string content)
         {
-            this.CommonInit(-1, Guid.NewGuid().ToString(), title, location.ID, location.Name, location, themes, DateTime.Now.Ticks, DateTime.Now.Ticks, keyVerse, otherMetadata, content);
+            this.CommonInit(-1, Guid.NewGuid().ToString(), title, location.ID, location.Name, location, themes, speakers, DateTime.Now.Ticks, DateTime.Now.Ticks, keyVerse, otherMetadata, content);
         }
 
         /// <summary>
@@ -279,9 +301,9 @@ namespace MySermonsWPF.Data
         /// <param name="keyVerse">The key verse of the sermon.</param>
         /// <param name="otherMetadata">Other metadata.</param>
         /// <param name="content">The content of the sermon.</param>
-        public Sermon(long id, string guid, string title, long locationId, string locationName, Location location, List<Theme> themes, long dateCreated, long lastAccessed, string keyVerse, string otherMetadata, string content)
+        public Sermon(long id, string guid, string title, long locationId, string locationName, Location location, List<Theme> themes, List<Speaker> speakers, long dateCreated, long lastAccessed, string keyVerse, string otherMetadata, string content)
         {
-            this.CommonInit(id, guid, title, locationId, locationName, location, themes, dateCreated, lastAccessed, keyVerse, otherMetadata, content);
+            this.CommonInit(id, guid, title, locationId, locationName, location, themes, speakers, dateCreated, lastAccessed, keyVerse, otherMetadata, content);
         }
 
         /// <summary>
@@ -298,7 +320,7 @@ namespace MySermonsWPF.Data
         /// <param name="keyVerse">The key verse of the sermon.</param>
         /// <param name="otherMetadata">Other metadata.</param>
         /// <param name="content">The content of the sermon.</param>
-        private void CommonInit(long id, string guid, string title, long locationId, string locationName, Location location, List<Theme> themes, long dateCreated, long lastAccessed, string keyVerse, string otherMetadata, string content)
+        private void CommonInit(long id, string guid, string title, long locationId, string locationName, Location location, List<Theme> themes, List<Speaker> speakers, long dateCreated, long lastAccessed, string keyVerse, string otherMetadata, string content)
         {
             this.id = id;
             this.guid = guid;
@@ -312,6 +334,7 @@ namespace MySermonsWPF.Data
             this.otherMetadata = otherMetadata;
             this.content = content;
             this.themes = themes;
+            this.speakers = speakers;
         }
 
         /// <summary>
@@ -322,9 +345,10 @@ namespace MySermonsWPF.Data
         {
             string sql = "INSERT INTO `sermons`(guid,title,location,date_created,last_access_date,key_verse,other_metadata,content) VALUES (@guid,@title,@location,@date_created,@last_access_date,@key_verse,@other_metadata,@content);";
             List<object> parameters = new List<object>() { this.guid, this.Title, this.locationId, this.dateCreated, this.lastAccessed, this.KeyVerse, this.OtherMetaData, this.Content };
-            if(Database.Create(sql, parameters, out this.id))
+            if (Database.Create(sql, parameters, out this.id))
             {
                 Theme.SetSermonThemes(this.Themes, this.ID);
+                Speaker.SetSermonSpeakers(this.Speakers, this.ID);
                 return true;
             }
             else
@@ -341,9 +365,10 @@ namespace MySermonsWPF.Data
         {
             string sql = "UPDATE `sermons` SET guid=@guid,title=@title,location=@location,date_created=@date_created,last_access_date=@last_access_date,key_verse=@key_verse,other_metadata=@other_metadata,content=@content WHERE id=@id;";
             List<object> parameters = new List<object>() { this.guid, this.Title, this.locationId, this.dateCreated, this.lastAccessed, this.KeyVerse, this.OtherMetaData, this.Content, this.ID };
-            if(Database.Update(sql, parameters))
+            if (Database.Update(sql, parameters))
             {
                 Theme.UpdateSermonThemes(this.Themes, this.ID);
+                Speaker.UpdateSermonSpeakers(this.Speakers, this.ID);
                 return true;
             }
             else
@@ -359,9 +384,10 @@ namespace MySermonsWPF.Data
         public bool Delete()
         {
             string sql = "DELETE FROM `sermons` WHERE id=@id;";
-            if(Database.Delete(sql, this.ID))
+            if (Database.Delete(sql, this.ID))
             {
                 Theme.DeleteSermonThemes(this.ID);
+                Speaker.DeleteSermonSpeakers(this.ID);
                 return true;
             }
             else
@@ -380,9 +406,10 @@ namespace MySermonsWPF.Data
             string sql = SELECT_STATEMENT + " WHERE sermons.id=@id;";
             List<Dictionary<string, object>> reader = Database.Read(sql, ID);
             List<Sermon> result = BuildFromReader(reader);
-            if(result != null && result.Count > 0)
+            if (result != null && result.Count > 0)
             {
                 result[0].Themes = Theme.GetSermonThemes(result[0].ID);
+                result[0].Speakers = Speaker.GetSermonSpeakers(result[0].ID);
                 return result[0];
             }
             else
@@ -401,9 +428,10 @@ namespace MySermonsWPF.Data
             string sql = SELECT_STATEMENT + " WHERE sermons.guid=@guid;";
             List<Dictionary<string, object>> reader = Database.Read(sql, guid);
             List<Sermon> result = BuildFromReader(reader);
-            if(result != null && result.Count > 0)
+            if (result != null && result.Count > 0)
             {
                 result[0].Themes = Theme.GetSermonThemes(result[0].ID);
+                result[0].Speakers = Speaker.GetSermonSpeakers(result[0].ID);
                 return result[0];
             }
             else
@@ -429,12 +457,12 @@ namespace MySermonsWPF.Data
         /// <returns>List of sermons if the parameter has data; null otherwise.</returns>
         private static List<Sermon> BuildFromReader(List<Dictionary<string, object>> rows)
         {
-            if(rows != null)
+            if (rows != null)
             {
                 List<Sermon> result = new List<Sermon>();
-                foreach(Dictionary<string, object> row in rows)
+                foreach (Dictionary<string, object> row in rows)
                 {
-                    if(row.Count == 10)
+                    if (row.Count == 10)
                     {
                         Sermon sermon = new Sermon
                         {
@@ -450,6 +478,7 @@ namespace MySermonsWPF.Data
                             content = (string)row["sermonContent"]
                         };
                         sermon.Themes = Theme.GetSermonThemes(sermon.ID);
+                        sermon.Speakers = Speaker.GetSermonSpeakers(sermon.ID);
                         result.Add(sermon);
                     }
                     else
@@ -457,7 +486,7 @@ namespace MySermonsWPF.Data
                         continue;
                     }
                 }
-                if(result.Count < 1) return null;
+                if (result.Count < 1) return null;
                 else return result;
             }
             else return null;
@@ -483,15 +512,15 @@ namespace MySermonsWPF.Data
         private static List<SortedSermons> SortActuator(SermonFilters filter, List<Sermon> sermons)
         {
             List<SortedSermons> sortedSermons = new List<SortedSermons>();
-            switch(filter)
+            switch (filter)
             {
                 case SermonFilters.Date:
                     HashSet<int> years = new HashSet<int>();
-                    foreach(Sermon sermon in sermons)
+                    foreach (Sermon sermon in sermons)
                     {
                         years.Add(sermon.DateCreated.Year);
                     }
-                    foreach(int year in years)
+                    foreach (int year in years)
                     {
                         AddToSortedList(list: ref sortedSermons, parent: year.ToString(), children: from sermon in sermons
                                                                                                     where sermon.DateCreated.Year == year
@@ -500,9 +529,9 @@ namespace MySermonsWPF.Data
                     break;
                 case SermonFilters.Location:
                     var locations = Location.Read();
-                    if(locations != null)
+                    if (locations != null)
                     {
-                        foreach(Location location in locations)
+                        foreach (Location location in locations)
                         {
                             AddToSortedList(list: ref sortedSermons, parent: location.Name, children: from sermon in sermons
                                                                                                       where sermon.Location.Name == location.Name
@@ -512,7 +541,7 @@ namespace MySermonsWPF.Data
                     break;
                 case SermonFilters.Title:
                     HashSet<char> chars = new HashSet<char>() { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
-                    foreach(char c in chars)
+                    foreach (char c in chars)
                     {
                         AddToSortedList(list: ref sortedSermons, parent: c.ToString(), children: from sermon in sermons
                                                                                                  where char.ToLower(sermon.Title[0]) == c
@@ -521,13 +550,25 @@ namespace MySermonsWPF.Data
                     break;
                 case SermonFilters.Theme:
                     var themes = Theme.Read();
-                    if(themes != null)
+                    if (themes != null)
                     {
-                        foreach(Theme theme in themes)
+                        foreach (Theme theme in themes)
                         {
                             AddToSortedList(list: ref sortedSermons, parent: theme.Name, children: from sermon in sermons
                                                                                                    where (sermon.Themes != null && sermon.Themes.Contains(theme))
                                                                                                    select sermon);
+                        }
+                    }
+                    break;
+                case SermonFilters.Speaker:
+                    var speakers = Speaker.Read();
+                    if (speakers != null)
+                    {
+                        foreach (Speaker speaker in speakers)
+                        {
+                            AddToSortedList(list: ref sortedSermons, parent: speaker.Name, children: from sermon in sermons
+                                                                                                     where (sermon.Speakers != null && sermon.Speakers.Contains(speaker))
+                                                                                                     select sermon);
                         }
                     }
                     break;
@@ -543,7 +584,7 @@ namespace MySermonsWPF.Data
         /// <param name="children">The collection of <see cref="Sermon"/> objects.</param>
         private static void AddToSortedList(ref List<SortedSermons> list, string parent, IEnumerable<Sermon> children)
         {
-            if(children != null && children.Count() > 0)
+            if (children != null && children.Count() > 0)
             {
                 SortedSermons sortedSermons = new SortedSermons
                 {

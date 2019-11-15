@@ -18,6 +18,10 @@
         /// </summary>
         Theme,
         /// <summary>
+        /// Sort by speaker.
+        /// </summary>
+        Speaker,
+        /// <summary>
         /// Sort by title (alphabetically).
         /// </summary>
         Title

@@ -11,19 +11,19 @@ namespace MySermonsWPF.UI
         {
             InitializeComponent();
         }
-        public void Populate(string title, string speaker, string keytext, string location, string themes, string otherinfo)
+        public void Populate(string title, string speakers, string keytext, string location, string themes, string otherinfo)
         {
             this.MetaTitle.Text = title ?? string.Empty;
-            this.MetaSpeaker.Text = speaker ?? string.Empty;
+            this.MetaSpeakers.Text = speakers ?? string.Empty;
             this.MetaKeyText.Text = keytext ?? string.Empty;
             this.MetaLocation.Text = location ?? string.Empty;
             this.MetaThemes.Text = themes ?? string.Empty;
             this.MetaOtherInfo.Text = otherinfo ?? string.Empty;
         }
-        public (string title, string speaker, string keytext, string location, string themes, string otherinfo) GetMetadata()
+        public (string title, string speakers, string keytext, string location, string themes, string otherinfo) GetMetadata()
         {
             return (this.MetaTitle.Text,
-                    this.MetaSpeaker.Text,
+                    this.MetaSpeakers.Text,
                     this.MetaKeyText.Text,
                     this.MetaLocation.Text,
                     this.MetaThemes.Text,

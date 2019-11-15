@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace MySermonsWPF.Data
 {
-    /// <summary>
-    /// Model for speaker information.
-    /// </summary>
     public class Speaker
     {
         /// <summary>
         /// Default speaker select statement.
         /// </summary>
-        private const string SELECT_STATEMENT = "SELECT * FROM speakers";
+        private const string SELECT_STATEMENT = "SELECT * FROM `speakers`";
         /// <summary>
         /// Property: Speaker ID depends on position in database.
         /// </summary>
@@ -39,7 +37,7 @@ namespace MySermonsWPF.Data
             {
                 if(string.IsNullOrEmpty(this.name))
                 {
-                    this.name = "SPEAKER_NOT_SET";
+                    this.name = "THEME_NOT_SET";
                 }
                 return this.name;
             }
@@ -56,7 +54,6 @@ namespace MySermonsWPF.Data
         /// Field: Unique name for the speaker.
         /// </summary>
         private string name = null;
-
         /// <summary>
         /// Speaker constructor: used when all properties are known.
         /// </summary>
@@ -70,9 +67,9 @@ namespace MySermonsWPF.Data
             this.name = name;
         }
         /// <summary>
-        /// Speaker constructor: used when only the name is known.
+        /// Speaker constructor: used when either name or GUID is know.
         /// </summary>
-        /// <param name="name">Speaker name.</param>
+        /// <param name="name">Name or GUID.</param>
         /// <param name="stringType">String type.</param>
         public Speaker(string name, StringType stringType)
         {
@@ -91,7 +88,7 @@ namespace MySermonsWPF.Data
             }
         }
         /// <summary>
-        /// Speaker constructor: used when only the ID is known.
+        /// Speaker constructor: used when only ID is known.
         /// </summary>
         /// <param name="id"></param>
         public Speaker(long id)
@@ -109,7 +106,7 @@ namespace MySermonsWPF.Data
             }
         }
         /// <summary>
-        /// Creates a speaker in the database, setting the id field as the new speaker index.
+        /// Creates a speaker in the database, setting the ID field as the new index.
         /// </summary>
         /// <returns>Is creation successful?</returns>
         public bool Create()
@@ -159,22 +156,14 @@ namespace MySermonsWPF.Data
             return result != null && result.Count > 0 ? result[0] : null;
         }
         /// <summary>
-        /// Selects a speaker by name.
+        /// Selects a speaker by name or GUID.
         /// </summary>
-        /// <param name="name">The name to be checked.</param>
+        /// <param name="name">Name or GUID.</param>
+        /// <param name="stringType">String type.</param>
         /// <returns>Selected speaker or null.</returns>
         public static Speaker Read(string name, StringType stringType)
         {
-            string sql = SELECT_STATEMENT;
-            switch(stringType)
-            {
-                case StringType.Name:
-                    sql += " WHERE name=@name";
-                    break;
-                case StringType.Guid:
-                    sql += " WHERE guid=@guid";
-                    break;
-            }
+            string sql = SELECT_STATEMENT + " WHERE name=@name";
             List<Dictionary<string, object>> reader = Database.Read(sql, name);
             List<Speaker> result = BuildFromReader(reader);
             return result != null && result.Count > 0 ? result[0] : null;
@@ -182,7 +171,7 @@ namespace MySermonsWPF.Data
         /// <summary>
         /// Selects all speakers.
         /// </summary>
-        /// <returns>All selected speakers or null.</returns>
+        /// <returns>List of speakers or null.</returns>
         public static List<Speaker> Read()
         {
             List<Dictionary<string, object>> reader = Database.Read(SELECT_STATEMENT);
@@ -191,7 +180,7 @@ namespace MySermonsWPF.Data
         /// <summary>
         /// Builds a speaker list from read database values.
         /// </summary>
-        /// <param name="rows">List of dictionary values to be parsed.</param>
+        /// <param name="rows">Read database values.</param>
         /// <returns>List of speakers or null.</returns>
         private static List<Speaker> BuildFromReader(List<Dictionary<string, object>> rows)
         {
@@ -202,8 +191,7 @@ namespace MySermonsWPF.Data
                 {
                     if(row.Count == 3)
                     {
-                        Speaker speaker = new Speaker((long)row["id"], (string)row["guid"], (string)row["name"]);
-                        result.Add(speaker);
+                        result.Add(new Speaker((long)row["id"], (string)row["guid"], (string)row["name"]));
                     }
                     else
                     {
@@ -213,6 +201,81 @@ namespace MySermonsWPF.Data
                 return result.Count < 1 ? null : result;
             }
             else return null;
+        }
+        /// <summary>
+        /// Gets all speakers associated with a sermon.
+        /// </summary>
+        /// <param name="sermonId">The ID of the sermon to be checked.</param>
+        /// <returns>List of speakers associated with a sermon.</returns>
+        public static List<Speaker> GetSermonSpeakers(long sermonId)
+        {
+            List<Dictionary<string, object>> rows = Database.Read("SELECT speaker_id FROM `sermon_speakers` WHERE sermon_id=@sermonId;", sermonId);
+            if(rows != null)
+            {
+                List<Speaker> result = new List<Speaker>();
+                foreach(Dictionary<string, object> row in rows)
+                {
+                    Speaker speaker = new Speaker((long)row["speaker_id"]);
+                    result.Add(speaker);
+                }
+                return result.Count < 1 ? null : result;
+            }
+            return null;
+        }
+        /// <summary>
+        /// Records speakers associated with a sermon in the database.
+        /// </summary>
+        /// <param name="speakers">List of speakers associated with a sermon.</param>
+        /// <param name="sermonId">The ID of the sermon.</param>
+        public static void SetSermonSpeakers(List<Speaker> speakers, long sermonId)
+        {
+            if(speakers != null)
+            {
+                StringBuilder sqlBuilder = new StringBuilder("INSERT INTO `sermon_speakers` (sermon_id, speaker_id) VALUES ");
+                foreach(Speaker speaker in speakers)
+                {
+                    sqlBuilder.Append(string.Format("({0}, {1}), ", sermonId, speaker.ID));
+                }
+                string sql = sqlBuilder.ToString();
+                sql = sql.TrimEnd(' ', ',');
+                Database.Create(sql, null);
+            }
+        }
+        /// <summary>
+        /// Updates the record of speakers associated with a sermon.
+        /// </summary>
+        /// <param name="speakers">List of speakers associated with a sermon.</param>
+        /// <param name="sermonId">The ID of the sermon.</param>
+        public static void UpdateSermonSpeakers(List<Speaker> speakers, long sermonId)
+        {
+            DeleteSermonSpeakers(sermonId);
+            SetSermonSpeakers(speakers, sermonId);
+        }
+        /// <summary>
+        /// Deletes the record of speakers associated with a sermon.
+        /// </summary>
+        /// <param name="sermonId">The ID of the sermon.</param>
+        public static void DeleteSermonSpeakers(long sermonId)
+        {
+            string sql = "DELETE FROM `sermon_speakers` WHERE sermon_id=@sermonId";
+            Database.Delete(sql, sermonId);
+        }
+        /// <summary>
+        /// Extract speakers from a delimited string.
+        /// </summary>
+        /// <param name="delimitedString">The delimited string to be parsed.</param>
+        /// <param name="delimiter">The delimiter to be used.</param>
+        /// <returns>List of speakers.</returns>
+        public static List<Speaker> ExtractFromDelimitedString(string delimitedString, char delimiter)
+        {
+            List<Speaker> speakers = new List<Speaker>();
+
+            var splits = delimitedString.Split(delimiter);
+            foreach(var split in splits)
+            {
+                speakers.Add(new Speaker(split.Trim(' '), StringType.Name));
+            }
+            return speakers;
         }
     }
 }

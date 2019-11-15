@@ -333,10 +333,11 @@ namespace MySermonsWPF.UI
             if (this.BaseMetadataPanel.Verify())
             {
                 char themeDelimiter = ',';
-                (string title, string speaker, string keytext, string location, string themes, string otherinfo) metadata = this.BaseMetadataPanel.GetMetadata();
+                (string title, string speakers, string keytext, string location, string themes, string otherinfo) metadata = this.BaseMetadataPanel.GetMetadata();
 
                 Location location = string.IsNullOrEmpty(metadata.location) ? null : new Location(metadata.location, StringType.Name);
                 List<Theme> themes = string.IsNullOrEmpty(metadata.themes) ? null : Theme.ExtractFromDelimitedString(metadata.themes, themeDelimiter);
+                List<Speaker> speakers = string.IsNullOrEmpty(metadata.speakers) ? null : Speaker.ExtractFromDelimitedString(metadata.speakers, themeDelimiter);
                 string content = GetRTBContents(FormatType.Rtf);
                 string title = string.IsNullOrEmpty(metadata.title) ? null : metadata.title;
                 string keyText = string.IsNullOrEmpty(metadata.keytext) ? null : metadata.keytext;
@@ -345,7 +346,7 @@ namespace MySermonsWPF.UI
                 if (this.sermon == null)
                 {
                     // the sermon does not exist; create
-                    this.sermon = new Sermon(title, location, themes, keyText, otherMetadata, content);
+                    this.sermon = new Sermon(title, location, themes, speakers, keyText, otherMetadata, content);
                     MessageBox.Show("Creation success: " + this.sermon.Create());
                 }
                 else
@@ -355,7 +356,7 @@ namespace MySermonsWPF.UI
                     var guid = this.sermon.GUID;
                     var dateCreated = this.sermon.DateCreated.Ticks;
                     var lastAccessed = DateTime.Now.Ticks;
-                    this.sermon = new Sermon(id, guid, title, location.ID, location.Name, location, themes, dateCreated, lastAccessed, keyText, otherMetadata, content);
+                    this.sermon = new Sermon(id, guid, title, location.ID, location.Name, location, themes, speakers, dateCreated, lastAccessed, keyText, otherMetadata, content);
                     MessageBox.Show("Update successful: " + this.sermon.Update());
                 }
             }
