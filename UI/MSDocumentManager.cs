@@ -33,15 +33,15 @@ namespace MySermonsWPF.UI
         public string GetRichText(string dataFormat)
         {
             TextRange textRange = new TextRange(this.rtb.Document.ContentStart, this.rtb.Document.ContentEnd);
-            if(textRange.Text.Trim().Length > 0)
+            if (textRange.Text.Trim().Length > 0)
             {
-                using(var stream = new MemoryStream())
+                using (var stream = new MemoryStream())
                 {
                     textRange.Save(stream, dataFormat);
                     this.ResetStream(stream);
                     StringBuilder stringBuilder = new StringBuilder();
                     int b;
-                    while((b = stream.ReadByte()) != -1)
+                    while ((b = stream.ReadByte()) != -1)
                     {
                         stringBuilder.Append(Convert.ToChar(b));
                     }
@@ -60,9 +60,9 @@ namespace MySermonsWPF.UI
         /// <param name="richText">The string representation of the rich text.</param>
         public void SetRichText(string richText, string dataFormat)
         {
-            if(!string.IsNullOrEmpty(richText))
+            if (!string.IsNullOrEmpty(richText))
             {
-                using(Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(richText)))
+                using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(richText)))
                 {
                     TextRange textRange = new TextRange(this.rtb.Document.ContentStart, this.rtb.Document.ContentEnd);
                     textRange.Load(stream, dataFormat);
@@ -77,7 +77,7 @@ namespace MySermonsWPF.UI
         public bool IsEmpty()
         {
             // check whether content is null, empty or whitespace
-            if(this.rtb != null)
+            if (this.rtb != null)
             {
                 var content = new TextRange(this.rtb.Document.ContentStart, this.rtb.Document.ContentEnd).Text;
                 return string.IsNullOrEmpty(content) || string.IsNullOrWhiteSpace(content);
@@ -105,6 +105,27 @@ namespace MySermonsWPF.UI
         private void ResetStream(Stream stream)
         {
             stream.Seek(0, SeekOrigin.Begin);
+        }
+
+        public int Find(string text, int startIndex = 0)
+        {
+            var textRange = new TextRange(this.rtb.Document.ContentStart, this.rtb.Document.ContentEnd);
+
+            return textRange.Text.IndexOf(text, startIndex, StringComparison.OrdinalIgnoreCase);
+        }
+        public void HighlightVerse(int startIndex, int length)
+        {
+            if (startIndex > -1)
+            {
+                var textRange = new TextRange(this.rtb.Document.ContentStart, this.rtb.Document.ContentEnd);
+                var textPointerStart = textRange.Start.GetPositionAtOffset(startIndex);
+                var textPointerEnd = textRange.Start.GetPositionAtOffset(startIndex + length);
+                var textRangeSelection = new TextRange(textPointerStart, textPointerEnd);
+                var prevFontWeight = textRangeSelection.GetPropertyValue(TextElement.FontWeightProperty);
+                textRangeSelection.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
+                textRangeSelection = new TextRange(textPointerEnd, textPointerEnd);
+                textRangeSelection.ApplyPropertyValue(TextElement.FontWeightProperty, prevFontWeight);
+            }
         }
     }
 }
