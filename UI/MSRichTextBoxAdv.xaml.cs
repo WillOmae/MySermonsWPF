@@ -12,6 +12,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using DiffPlex;
+using DiffPlex.Model;
 
 namespace MySermonsWPF.UI
 {
@@ -57,8 +59,16 @@ namespace MySermonsWPF.UI
         /// </summary>
         private const string regexBCVrBCV = @"\b(\d *)?[a-zA-Z]{1,} *\d{1,3} *: *\d{1,3}-(\d *)?[a-zA-Z]{1,} *\d{1,3} *: *\d{1,3}\b";
 
+
+        private readonly bool? verseBold = true;
+        private readonly Underline? verseUnderline = Underline.Single;
+        private readonly Color? verseColor = Color.FromArgb(0xff, 0x05, 0x63, 0xc1);
+
         private readonly Regex combinedRegex;
         private readonly XmlBible xmlBible;
+
+        private Point lastMousePosition = new Point(-1, -1);
+        private string lastStringComposition = string.Empty;
 
         /// <summary>
         /// Constructor accepting a parameter of type sermon.
@@ -84,6 +94,63 @@ namespace MySermonsWPF.UI
             }
             BaseRichTextBox.KeyUp += this.BaseRichTextBox_KeyUp;
             BaseRichTextBox.PreviewMouseLeftButtonUp += this.BaseRichTextBox_PreviewMouseLeftButtonUp;
+            //BaseRichTextBox.PreviewMouseMove += this.BaseRichTextBox_PreviewMouseMove;
+        }
+
+        private void BaseRichTextBox_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            var current = BaseRichTextBox.Selection.Start;
+            Point mousePoint = Mouse.GetPosition(BaseRichTextBox);
+            if (lastMousePosition.Equals(mousePoint))
+                return;
+            lastMousePosition = mousePoint;
+            BaseRichTextBox.CaptureMouse();
+
+            // Raises mouse event to perform selection at mouse point.
+            this.BaseRichTextBox.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, MouseButton.Left)
+            {
+                RoutedEvent = Mouse.MouseDownEvent
+            });
+            this.BaseRichTextBox.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, MouseButton.Left)
+            {
+                RoutedEvent = Mouse.MouseUpEvent
+            });
+            // Moves the start and end pointer to Word start and end respectively.
+            BaseRichTextBox.Selection.Start.MoveToWordStart();
+            BaseRichTextBox.Selection.End.MoveToWordEnd();
+            // Gets the word start location
+            Rect startRect = BaseRichTextBox.Selection.Start.GetRect();
+            // Gets the word end location.
+            Rect endRect = BaseRichTextBox.Selection.End.GetRect();
+            //Calculates the width.
+            double width = 0;
+            if (endRect.X - startRect.X > 0)
+                width = endRect.X - startRect.X;
+            // Calculates teh word bounds.
+            Rect wordBounds = new Rect(startRect.X, startRect.Y, width, startRect.Height);
+            //Check whether teh mouse point within the word bounds.
+            if (wordBounds.Contains(mousePoint))
+            {
+                //Gets the word under the mouse pointer.
+                var charFormat = BaseRichTextBox.Selection.CharacterFormat;
+                if (charFormat.Bold == verseBold && charFormat.Underline == verseUnderline && charFormat.FontColor == verseColor)
+                {
+                    Mouse.SetCursor(Cursors.Hand);
+                }
+                else
+                {
+                    Mouse.SetCursor(Cursors.IBeam);
+                }
+            }
+            else
+            {
+                Mouse.SetCursor(Cursors.IBeam);
+            }
+
+            // Reset the cursor position to last user editing position.
+            BaseRichTextBox.Selection.Select(current, current);
+            BaseRichTextBox.ReleaseMouseCapture();
+            BaseRichTextBox.Focus();
         }
 
         private void BaseRichTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -92,70 +159,53 @@ namespace MySermonsWPF.UI
         }
         private void DetectVerses()
         {
-            string text = GetRTBContents(FormatType.Txt);
-            var matches = combinedRegex.Matches(text);
-
-            foreach (Match match in matches)
+            string currStringComposition = this.GetRTBContents(FormatType.Txt);
+            Differ differ = new Differ();
+            DiffResult diffResults = differ.CreateCharacterDiffs(lastStringComposition, currStringComposition, false);
+            if (diffResults.DiffBlocks.Count > 0)
             {
-                var verses = xmlBible.Parse(match.Value);
-                if (verses != null)
+                for (int blockCount = 0; blockCount < diffResults.DiffBlocks.Count; blockCount++)
                 {
-                    var positions = BaseRichTextBox.FindAll(match.Value, FindOptions.None);
-                    if (positions != null)
+                    DiffBlock diffResult = diffResults.DiffBlocks[blockCount];
+                    if (diffResult.InsertCountB != 0)
                     {
-                        for (int i = 0; i < positions.Count; i++)
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (int diffIndex = diffResult.InsertStartB; diffIndex < diffResult.InsertStartB + diffResult.InsertCountB; diffIndex++)
                         {
-                            var position = positions[i];
-                            var hierarchicalIndex = position.Start.HierarchicalIndex;
-                            var splits = hierarchicalIndex.Split(';');
-                            var sectionIndex = int.Parse(splits[0]);
-                            var blockIndex = int.Parse(splits[1]);
-                            var inlineIndex = int.Parse(splits[2]);
-                            var section = BaseRichTextBox.Document.Sections[sectionIndex];
+                            stringBuilder.Append(diffResults.PiecesNew[diffIndex]);
+                        }
+                        string insertedText = stringBuilder.ToString();
+                        var matches = this.combinedRegex.Matches(insertedText);
 
-                            if (section.Blocks[blockIndex] is ParagraphAdv paragraphAdv)
+                        foreach (Match match in matches)
+                        {
+                            if (this.xmlBible.Parse(match.Value) != null)
                             {
-                                StringBuilder stringBuilder = new StringBuilder();
-                                foreach (Inline inline in paragraphAdv.Inlines)
+                                var positions = BaseRichTextBox.FindAll(match.Value, FindOptions.None);
+                                if (positions != null)
                                 {
-                                    if (inline is SpanAdv inlineSpan)
+                                    for (int posCount = 0; posCount < positions.Count; posCount++)
                                     {
-                                        stringBuilder.Append(inlineSpan.Text);
-                                    }
-                                }
-                                string posText = position.Text;
-                                int index = stringBuilder.ToString().IndexOf(posText);
-                                if (index != -1)
-                                {
-                                    int foundLength = 0;
-                                    string[] parts = posText.Split('-', ',', ' ', ';', ':');
-                                    int countTotal = 2 * parts.Length - 1;
-                                    for (int j = 0; j < paragraphAdv.Inlines.Count; j++)
-                                    {
-                                        if (paragraphAdv.Inlines[j] is SpanAdv inlineSpan)
+                                        var position = positions[posCount];
+                                        if (position != null)
                                         {
-                                            foundLength += inlineSpan.Text.Length;
-                                            if (foundLength > index && foundLength <= (index + posText.Length))
+                                            TextPosition start = position.Start;
+                                            TextPosition end = position.End;
+                                            if (start.Paragraph.Equals(end.Paragraph))
                                             {
-                                                paragraphAdv.Inlines.Insert(j++, new FieldBeginAdv());
-                                                paragraphAdv.Inlines.Insert(j++, new SpanAdv
-                                                {
-                                                    Text = " HYPERLINK \"" + posText + "\" "
-                                                });
-                                                paragraphAdv.Inlines.Insert(j++, new FieldSeparatorAdv());
-                                                SpanAdv fieldResult = new SpanAdv
-                                                {
-                                                    Text = posText
-                                                };
-                                                fieldResult.CharacterFormat.Underline = Underline.Single;
-                                                fieldResult.CharacterFormat.FontColor = Color.FromArgb(0xff, 0x05, 0x63, 0xc1);
-                                                paragraphAdv.Inlines.Insert(j++, fieldResult);
-                                                paragraphAdv.Inlines.Insert(j++, new FieldEndAdv());
-                                                for (int k = countTotal - 1; k >= 0 && (j + k) >= 0 && (j + k) < paragraphAdv.Inlines.Count; k--)
-                                                {
-                                                    paragraphAdv.Inlines.RemoveAt(j + k);
-                                                }
-                                                break;
+                                                int inlineIndex = int.Parse(start.HierarchicalIndex.Split(';')[2]);
+                                                ParagraphAdv paragraphAdv = start.Paragraph;
+                                                BaseRichTextBox.Selection.Select(start, end);
+                                                bool? initialBold = BaseRichTextBox.Selection.CharacterFormat.Bold;
+                                                Underline? initialUnderline = BaseRichTextBox.Selection.CharacterFormat.Underline;
+                                                Color? initialColor = BaseRichTextBox.Selection.CharacterFormat.FontColor;
+                                                BaseRichTextBox.Selection.CharacterFormat.Bold = verseBold;
+                                                BaseRichTextBox.Selection.CharacterFormat.Underline = verseUnderline;
+                                                BaseRichTextBox.Selection.CharacterFormat.FontColor = verseColor;
+                                                BaseRichTextBox.Selection.Select(end, end);
+                                                BaseRichTextBox.Selection.CharacterFormat.Bold = initialBold;
+                                                BaseRichTextBox.Selection.CharacterFormat.Underline = initialUnderline;
+                                                BaseRichTextBox.Selection.CharacterFormat.FontColor = initialColor;
                                             }
                                         }
                                     }
@@ -164,19 +214,21 @@ namespace MySermonsWPF.UI
                         }
                     }
                 }
+                lastStringComposition = currStringComposition;
+                return;
             }
         }
         private void BaseRichTextBox_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.OemPeriod)
             {
-                var currentStart = BaseRichTextBox.Selection.Start;
-                var currentEnd = BaseRichTextBox.Selection.End;
+                e.Handled = true;
+                var currentStart = BaseRichTextBox.Selection.Start.HierarchicalIndex;
 
                 DetectVerses();
 
-                BaseRichTextBox.Selection.Select(currentStart, currentEnd);
-                e.Handled = true;
+                TextPosition textPosition = BaseRichTextBox.Document.GetTextPosition(currentStart);
+                BaseRichTextBox.Selection.Select(textPosition, textPosition);
             }
             else
             {
