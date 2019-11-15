@@ -508,7 +508,7 @@ namespace MySermonsWPF.Data
         /// </summary>
         /// <param name="filter">The filter to be used to sort.</param>
         /// <param name="sermons">The non-null list of sermons to be sorted.</param>
-        /// <returns>List of sorted sermons or null.</returns>
+        /// <returns>List of sorted sermons.</returns>
         private static List<SortedSermons> SortActuator(SermonFilters filter, List<Sermon> sermons)
         {
             List<SortedSermons> sortedSermons = new List<SortedSermons>();
@@ -522,58 +522,52 @@ namespace MySermonsWPF.Data
                     }
                     foreach (int year in years)
                     {
-                        AddToSortedList(list: ref sortedSermons, parent: year.ToString(), children: from sermon in sermons
-                                                                                                    where sermon.DateCreated.Year == year
-                                                                                                    select sermon);
+                        AddToSortedList(ref sortedSermons, year.ToString(), from sermon in sermons
+                                                                            where sermon.DateCreated.Year == year
+                                                                            select sermon);
                     }
                     break;
                 case SermonFilters.Location:
                     var locations = Location.Read();
-                    if (locations != null)
+                    if (locations == null) break;
+                    foreach (Location location in locations)
                     {
-                        foreach (Location location in locations)
-                        {
-                            AddToSortedList(list: ref sortedSermons, parent: location.Name, children: from sermon in sermons
-                                                                                                      where sermon.Location.Name == location.Name
-                                                                                                      select sermon);
-                        }
+                        AddToSortedList(ref sortedSermons, location.Name, from sermon in sermons
+                                                                          where sermon.Location.Name == location.Name
+                                                                          select sermon);
                     }
                     break;
                 case SermonFilters.Title:
                     HashSet<char> chars = new HashSet<char>() { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
                     foreach (char c in chars)
                     {
-                        AddToSortedList(list: ref sortedSermons, parent: c.ToString(), children: from sermon in sermons
-                                                                                                 where char.ToLower(sermon.Title[0]) == c
-                                                                                                 select sermon);
+                        AddToSortedList(ref sortedSermons, c.ToString(), from sermon in sermons
+                                                                         where char.ToLower(sermon.Title[0]) == c
+                                                                         select sermon);
                     }
                     break;
                 case SermonFilters.Theme:
                     var themes = Theme.Read();
-                    if (themes != null)
+                    if (themes == null) break;
+                    foreach (Theme theme in themes)
                     {
-                        foreach (Theme theme in themes)
-                        {
-                            AddToSortedList(list: ref sortedSermons, parent: theme.Name, children: from sermon in sermons
-                                                                                                   where (sermon.Themes != null && sermon.Themes.Contains(theme))
-                                                                                                   select sermon);
-                        }
+                        AddToSortedList(ref sortedSermons, theme.Name, from sermon in sermons
+                                                                       where (sermon.Themes != null && sermon.Themes.Contains(theme))
+                                                                       select sermon);
                     }
                     break;
                 case SermonFilters.Speaker:
                     var speakers = Speaker.Read();
-                    if (speakers != null)
+                    if (speakers == null) break;
+                    foreach (Speaker speaker in speakers)
                     {
-                        foreach (Speaker speaker in speakers)
-                        {
-                            AddToSortedList(list: ref sortedSermons, parent: speaker.Name, children: from sermon in sermons
-                                                                                                     where (sermon.Speakers != null && sermon.Speakers.Contains(speaker))
-                                                                                                     select sermon);
-                        }
+                        AddToSortedList(ref sortedSermons, speaker.Name, from sermon in sermons
+                                                                         where (sermon.Speakers != null && sermon.Speakers.Contains(speaker))
+                                                                         select sermon);
                     }
                     break;
             }
-            return sortedSermons.Count > 0 ? sortedSermons : null;
+            return sortedSermons;
         }
 
         /// <summary>
@@ -584,7 +578,7 @@ namespace MySermonsWPF.Data
         /// <param name="children">The collection of <see cref="Sermon"/> objects.</param>
         private static void AddToSortedList(ref List<SortedSermons> list, string parent, IEnumerable<Sermon> children)
         {
-            if (children != null && children.Count() > 0)
+            if (children != null && children.Any())
             {
                 SortedSermons sortedSermons = new SortedSermons
                 {
