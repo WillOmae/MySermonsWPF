@@ -15,19 +15,33 @@ namespace MySermonsWPF
     public partial class MainWindow : Window
     {
         public List<Sermon> allSermons;
-        public static ObservableCollection<SortedSermons> Sermons { get; set; }
+        public static ObservableCollection<SortedSermons> SermonsToDisplay { get; set; }
         public static List<string> Filters { get; set; }
+        public SermonFilters CurrentFilter
+        {
+            get
+            {
+                return currentFilter;
+            }
+            set
+            {
+                currentFilter = value;
+                this.SortSermons();
+            }
+        }
+        private SermonFilters currentFilter = SermonFilters.Location;
         public MainWindow()
         {
             if (Database.Initialise())
             {
                 allSermons = Sermon.Read();
-                Sermons = new ObservableCollection<SortedSermons>(Sermon.Sort(SermonFilters.Location, allSermons));
+                SermonsToDisplay = new ObservableCollection<SortedSermons>();
                 Filters = new List<string>()
                 {
-                    "Date","Location","Speaker","Theme","Title"
+                    "Date", "Location", "Speaker", "Theme", "Title"
                 };
                 this.InitializeComponent();
+                this.BaseComboBoxFilters.SelectedIndex = 1;
                 this.BaseTabControl.Items.Add(new TabItem()
                 {
                     Header = "New document",
@@ -37,17 +51,6 @@ namespace MySermonsWPF
             else
             {
                 MessageBox.Show("Database initialisation failed.");
-            }
-        }
-
-        private void TreeViewEntry_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if ((sender is TextBlock textBlock))
-            {
-                if (e.ChangedButton == MouseButton.Left && e.ClickCount == 2)
-                {
-                    this.ViewSermonByGuid(textBlock.Tag.ToString());
-                }
             }
         }
 
@@ -114,22 +117,50 @@ namespace MySermonsWPF
         /// <returns>A sermon or null.</returns>
         private Sermon FindChildInSortedListByGuid(string guid)
         {
-            return (from x in Sermons
+            return (from x in SermonsToDisplay
                     from y in x.Children
                     where y.GUID.Equals(guid)
                     select y).FirstOrDefault();
         }
 
         /// <summary>
-        /// Find a parent in the sorted sermons list by tag.
+        /// Update the current filter property.
         /// </summary>
-        /// <param name="guid">The string representation of the GUID.</param>
-        /// <returns>SortedSermons or null.</returns>
-        private SortedSermons FindParentInSortedList(string tag)
+        /// <param name="filterString">The string representation of the new filter.</param>
+        private void SetCurrentFilter(string filterString)
         {
-            return (from x in Sermons
-                    where x.Parent.Equals(tag)
-                    select x).FirstOrDefault();
+            switch (filterString)
+            {
+                case "Date":
+                    CurrentFilter = SermonFilters.Date;
+                    break;
+                case "Location":
+                default:
+                    CurrentFilter = SermonFilters.Location;
+                    break;
+                case "Speaker":
+                    CurrentFilter = SermonFilters.Speaker;
+                    break;
+                case "Theme":
+                    CurrentFilter = SermonFilters.Theme;
+                    break;
+                case "Title":
+                    CurrentFilter = SermonFilters.Title;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Sort the sermons based on the current filter.
+        /// </summary>
+        private void SortSermons()
+        {
+            List<SortedSermons> list = Sermon.Sort(CurrentFilter, allSermons);
+            SermonsToDisplay.Clear();
+            foreach (SortedSermons item in list)
+            {
+                SermonsToDisplay.Add(item);
+            }
         }
 
         /// <summary>
@@ -137,52 +168,11 @@ namespace MySermonsWPF
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ViewTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
-        {
-            this.ChildContextMenuHandler(sender, "view");
-        }
-
-        /// <summary>
-        /// Event handler for treeview child context menu: edit clicked.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void EditTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
-        {
-            this.ChildContextMenuHandler(sender, "edit");
-        }
-
-        /// <summary>
-        /// Event handler for treeview child context menu: print clicked.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void PrintTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
-        {
-            this.ChildContextMenuHandler(sender, "print");
-        }
-
-        /// <summary>
-        /// Event handler for treeview child context menu: delete clicked.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DeleteTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
-        {
-            this.ChildContextMenuHandler(sender, "delete");
-        }
-
-        /// <summary>
-        /// Fires appropriate actions based on a specified action.
-        /// </summary>
-        /// <param name="sender">The control that raised the event.</param>
-        /// <param name="action">The action to be fired.</param>
-        /// <example>action: view, edit, print, delete</example>
-        private void ChildContextMenuHandler(object sender, string action)
+        private void ChildTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
         {
             if ((sender is MenuItem menuItem) && (menuItem.Parent is ContextMenu contextMenu) && ((contextMenu).PlacementTarget is TextBlock textBlock))
             {
-                switch (action)
+                switch (menuItem.Header.ToString().ToLower())
                 {
                     case "view":
                         this.ViewSermonByGuid(textBlock.Tag.ToString());
@@ -205,163 +195,83 @@ namespace MySermonsWPF
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ViewAllTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
+        private void ParentTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
         {
-            this.ParentContextMenuHandler(sender, "view");
-        }
-
-        /// <summary>
-        /// Event handler for treeview child context menu: edit clicked.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void EditAllTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
-        {
-            this.ParentContextMenuHandler(sender, "edit");
-        }
-
-        /// <summary>
-        /// Event handler for treeview child context menu: print clicked.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void PrintAllTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
-        {
-            this.ParentContextMenuHandler(sender, "print");
-        }
-
-        /// <summary>
-        /// Event handler for treeview child context menu: delete clicked.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DeleteAllTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
-        {
-            this.ParentContextMenuHandler(sender, "delete");
-        }
-
-        /// <summary>
-        /// Fires appropriate actions based on a specified action.
-        /// </summary>
-        /// <param name="sender">The control that raised the event.</param>
-        /// <param name="action">The action to be fired.</param>
-        /// <example>action: view, edit, print, delete</example>
-        private void ParentContextMenuHandler(object sender, string action)
-        {
-            if ((sender is MenuItem menuItem) && (menuItem.Parent is ContextMenu contextMenu))
+            if ((sender is MenuItem menuItem) && (menuItem.Parent is ContextMenu contextMenu) && contextMenu.PlacementTarget is TreeView)
             {
-                if (contextMenu.PlacementTarget is TextBlock textBlock)
+                string action = menuItem.Header.ToString().ToLower().Replace(" all", "");
+                foreach (SortedSermons sortedSermon in SermonsToDisplay)
                 {
-                    var sortedSermon = this.FindParentInSortedList(textBlock.Tag.ToString());
                     switch (action)
                     {
                         case "view":
-                            foreach (var sermon in sortedSermon.Children)
+                            foreach (Sermon sermon in sortedSermon.Children)
                             {
                                 this.ViewSermonByGuid(sermon.GUID);
                             }
                             break;
                         case "edit":
-                            foreach (var sermon in sortedSermon.Children)
+                            foreach (Sermon sermon in sortedSermon.Children)
                             {
                                 this.EditSermonByGuid(sermon.GUID);
                             }
                             break;
                         case "print":
-                            foreach (var sermon in sortedSermon.Children)
+                            foreach (Sermon sermon in sortedSermon.Children)
                             {
                                 this.PrintSermonByGuid(sermon.GUID);
                             }
                             break;
                         case "delete":
-                            foreach (var sermon in sortedSermon.Children)
+                            foreach (Sermon sermon in sortedSermon.Children)
                             {
                                 this.DeleteSermonByGuid(sermon.GUID);
                             }
                             break;
                     }
                 }
-                else if (contextMenu.PlacementTarget is TreeView treeView)
+            }
+        }
+
+        /// <summary>
+        /// Event handler for treeview entry: clicked.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TreeViewEntry_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if ((sender is TextBlock textBlock))
+            {
+                if (e.ChangedButton == MouseButton.Left && e.ClickCount == 2)
                 {
-                    var sortedSermons = treeView.ItemsSource;
-                    foreach (SortedSermons sortedSermon in sortedSermons)
-                    {
-                        switch (action)
-                        {
-                            case "view":
-                                foreach (var sermon in sortedSermon.Children)
-                                {
-                                    this.ViewSermonByGuid(sermon.GUID);
-                                }
-                                break;
-                            case "edit":
-                                foreach (var sermon in sortedSermon.Children)
-                                {
-                                    this.EditSermonByGuid(sermon.GUID);
-                                }
-                                break;
-                            case "print":
-                                foreach (var sermon in sortedSermon.Children)
-                                {
-                                    this.PrintSermonByGuid(sermon.GUID);
-                                }
-                                break;
-                            case "delete":
-                                foreach (var sermon in sortedSermon.Children)
-                                {
-                                    this.DeleteSermonByGuid(sermon.GUID);
-                                }
-                                break;
-                        }
-                    }
+                    this.ViewSermonByGuid(textBlock.Tag.ToString());
                 }
             }
         }
-        private void SortSermons(string filterString)
-        {
-            SermonFilters filter;
-            switch (filterString)
-            {
-                case "Date":
-                    filter = SermonFilters.Date;
-                    break;
-                case "Location":
-                default:
-                    filter = SermonFilters.Location;
-                    break;
-                case "Speaker":
-                    filter = SermonFilters.Speaker;
-                    break;
-                case "Theme":
-                    filter = SermonFilters.Theme;
-                    break;
-                case "Title":
-                    filter = SermonFilters.Title;
-                    break;
-            }
-            this.SortSermons(filter);
-        }
-        private void SortSermons(SermonFilters filter)
-        {
-            List<SortedSermons> list = Sermon.Sort(filter, allSermons);
-            Sermons.Clear();
-            foreach (SortedSermons item in list)
-            {
-                Sermons.Add(item);
-            }
-        }
+
+        /// <summary>
+        /// Event handler for filter combobox: selection changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 1)
             {
-                SortSermons(e.AddedItems[0].ToString());
+                this.SetCurrentFilter(e.AddedItems[0].ToString());
             }
         }
+
+        /// <summary>
+        /// Event handler for treeview child context menu: sort by menu item clicked.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SortByMenuItem_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            if(e.Source is TextBlock textBlock)
+            if (e.Source is TextBlock textBlock)
             {
-                this.SortSermons(textBlock.Text);
+                this.SetCurrentFilter(textBlock.Text);
             }
         }
     }

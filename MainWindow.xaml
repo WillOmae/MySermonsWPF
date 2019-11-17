@@ -22,10 +22,10 @@
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
         <ContextMenu x:Key="ParentContextMenu">
-            <MenuItem Header="View all" Click="ViewAllTreeViewContextMenu_Click"/>
-            <MenuItem Header="Edit all" Click="EditAllTreeViewContextMenu_Click"/>
-            <MenuItem Header="Print all" Click="PrintAllTreeViewContextMenu_Click"/>
-            <MenuItem Header="Delete all" Click="DeleteAllTreeViewContextMenu_Click"/>
+            <MenuItem Header="View all" Click="ParentTreeViewContextMenu_Click"/>
+            <MenuItem Header="Edit all" Click="ParentTreeViewContextMenu_Click"/>
+            <MenuItem Header="Print all" Click="ParentTreeViewContextMenu_Click"/>
+            <MenuItem Header="Delete all" Click="ParentTreeViewContextMenu_Click"/>
             <MenuItem Header="Sort by..." ItemsSource="{x:Static local:MainWindow.Filters}">
                 <MenuItem.ItemTemplate>
                     <DataTemplate>
@@ -38,10 +38,10 @@
             </MenuItem>
         </ContextMenu>
         <ContextMenu x:Key="ChildContextMenu">
-            <MenuItem Header="View" Click="ViewTreeViewContextMenu_Click"/>
-            <MenuItem Header="Edit" Click="EditTreeViewContextMenu_Click"/>
-            <MenuItem Header="Print" Click="PrintTreeViewContextMenu_Click"/>
-            <MenuItem Header="Delete" Click="DeleteTreeViewContextMenu_Click"/>
+            <MenuItem Header="View" Click="ChildTreeViewContextMenu_Click"/>
+            <MenuItem Header="Edit" Click="ChildTreeViewContextMenu_Click"/>
+            <MenuItem Header="Print" Click="ChildTreeViewContextMenu_Click"/>
+            <MenuItem Header="Delete" Click="ChildTreeViewContextMenu_Click"/>
         </ContextMenu>
     </Window.Resources>
     <DockPanel LastChildFill="True">
@@ -95,8 +95,10 @@
                            Width="50"
                            VerticalAlignment="Center"
                            Padding="5 0"/>
-                <ComboBox Height="20"
+                <ComboBox x:Name="BaseComboBoxFilters"
+                          Height="20"
                           Width="100"
+                          Style="{StaticResource MajorControlStyle}"
                           ItemsSource="{x:Static local:MainWindow.Filters}"
                           SelectionChanged="ComboBox_SelectionChanged"
                           VerticalContentAlignment="Center"
@@ -105,7 +107,8 @@
                         <DataTemplate>
                             <TextBlock Text="{Binding}"
                                        Margin="0"
-                                       Padding="0"/>
+                                       Padding="0"
+                                       HorizontalAlignment="Stretch"/>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
@@ -114,7 +117,7 @@
                       Grid.Column="0"
                       Grid.ColumnSpan="2"
                       Grid.Row="1"
-                      ItemsSource="{x:Static local:MainWindow.Sermons}"
+                      ItemsSource="{x:Static local:MainWindow.SermonsToDisplay}"
                       Style="{StaticResource MajorControlStyle}"
                       ContextMenu="{StaticResource ParentContextMenu}">
                 <TreeView.ItemTemplate>
