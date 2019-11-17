@@ -552,7 +552,7 @@ namespace MySermonsWPF.Data
                     foreach (Theme theme in themes)
                     {
                         AddToSortedList(ref sortedSermons, theme.Name, from sermon in sermons
-                                                                       where (sermon.Themes != null && sermon.Themes.Contains(theme))
+                                                                       where sermon.Themes != null && sermon.Themes.Contains(theme)
                                                                        select sermon);
                     }
                     break;
@@ -562,7 +562,7 @@ namespace MySermonsWPF.Data
                     foreach (Speaker speaker in speakers)
                     {
                         AddToSortedList(ref sortedSermons, speaker.Name, from sermon in sermons
-                                                                         where (sermon.Speakers != null && sermon.Speakers.Contains(speaker))
+                                                                         where sermon.Speakers != null && sermon.Speakers.Contains(speaker)
                                                                          select sermon);
                     }
                     break;
@@ -578,15 +578,13 @@ namespace MySermonsWPF.Data
         /// <param name="children">The collection of <see cref="Sermon"/> objects.</param>
         private static void AddToSortedList(ref List<SortedSermons> list, string parent, IEnumerable<Sermon> children)
         {
-            if (children != null && children.Any())
+            if (children == null || !children.Any()) return;
+            SortedSermons sortedSermons = new SortedSermons
             {
-                SortedSermons sortedSermons = new SortedSermons
-                {
-                    Parent = parent,
-                    Children = children.ToList()
-                };
-                list.Add(sortedSermons);
-            }
+                Parent = parent,
+                Children = children.ToList()
+            };
+            list.Add(sortedSermons);
         }
 
         public bool Equals(Sermon test)
