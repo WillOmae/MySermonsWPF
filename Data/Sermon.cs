@@ -333,8 +333,28 @@ namespace MySermonsWPF.Data
             this.keyVerse = keyVerse;
             this.otherMetadata = otherMetadata;
             this.content = content;
-            this.themes = themes;
-            this.speakers = speakers;
+            if (themes == null)
+            {
+                this.themes = new List<Theme>
+                {
+                    new Theme("none", StringType.Name)
+                };
+            }
+            else
+            {
+                this.themes = themes;
+            }
+            if (speakers == null)
+            {
+                this.speakers = new List<Speaker>
+                {
+                    new Speaker("none", StringType.Name)
+                };
+            }
+            else
+            {
+                this.speakers = speakers;
+            }
         }
 
         /// <summary>

@@ -27,10 +27,10 @@ namespace MySermonsWPF.UI
         /// Sermon that is to be manipulated internally.
         /// </summary>
         private Sermon sermon = null;
-        private BitmapImage closeIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/collapse.png"));
-        private BitmapImage openIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/expand.png"));
-        private string closePanelTooltip = "Close details panel.";
-        private string openPanelTooltip = "Open details panel";
+        private readonly BitmapImage closeIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/collapse.png"));
+        private readonly BitmapImage openIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/expand.png"));
+        private readonly string closePanelTooltip = "Close details panel.";
+        private readonly string openPanelTooltip = "Open details panel";
         /// <summary>
         /// Single chapter e.g. Hebrews 1
         /// </summary>
