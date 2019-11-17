@@ -1,30 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using MySermonsWPF.Data;
+using MySermonsWPF.UI;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using MySermonsWPF.Data;
-using MySermonsWPF.UI;
 
 namespace MySermonsWPF
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow:Window
+    public partial class MainWindow : Window
     {
-        public static List<SortedSermons> Sermons { get; set; }
+        public static ObservableCollection<SortedSermons> Sermons { get; set; }
         public MainWindow()
         {
-            if(Database.Initialise())
+            if (Database.Initialise())
             {
-                Sermons = Sermon.Sort(SermonFilters.Location, Sermon.Read());
+                Sermons = new ObservableCollection<SortedSermons>(Sermon.Sort(SermonFilters.Location, Sermon.Read()));
 
                 this.InitializeComponent();
                 this.BaseTabControl.Items.Add(new TabItem()
                 {
                     Header = "New document",
-                    Content = new MSRichTextBox(null)
+                    Content = new MSRichTextBoxAdv(null)
                 });
             }
             else
@@ -35,9 +36,9 @@ namespace MySermonsWPF
 
         private void TreeViewEntry_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if((sender is TextBlock textBlock))
+            if ((sender is TextBlock textBlock))
             {
-                if(e.ChangedButton == MouseButton.Left && e.ClickCount == 2)
+                if (e.ChangedButton == MouseButton.Left && e.ClickCount == 2)
                 {
                     this.ViewSermonByGuid(textBlock.Tag.ToString());
                 }
@@ -51,7 +52,7 @@ namespace MySermonsWPF
         private void ViewSermonByGuid(string guid)
         {
             var sermon = this.FindChildInSortedListByGuid(guid);
-            if(sermon != null)
+            if (sermon != null)
             {
                 TabItem tabItem = new TabItem()
                 {
@@ -70,12 +71,12 @@ namespace MySermonsWPF
         private void EditSermonByGuid(string guid)
         {
             var sermon = this.FindChildInSortedListByGuid(guid);
-            if(sermon != null)
+            if (sermon != null)
             {
                 TabItem tabItem = new TabItem()
                 {
                     Header = sermon.Title,
-                    Content = new MSRichTextBox(sermon)
+                    Content = new MSRichTextBoxAdv(sermon)
                 };
                 this.BaseTabControl.Items.Add(tabItem);
                 this.BaseTabControl.SetSelectedItem(tabItem);
@@ -173,9 +174,9 @@ namespace MySermonsWPF
         /// <example>action: view, edit, print, delete</example>
         private void ChildContextMenuHandler(object sender, string action)
         {
-            if((sender is MenuItem menuItem) && (menuItem.Parent is ContextMenu contextMenu) && ((contextMenu).PlacementTarget is TextBlock textBlock))
+            if ((sender is MenuItem menuItem) && (menuItem.Parent is ContextMenu contextMenu) && ((contextMenu).PlacementTarget is TextBlock textBlock))
             {
-                switch(action)
+                switch (action)
                 {
                     case "view":
                         this.ViewSermonByGuid(textBlock.Tag.ToString());
@@ -241,66 +242,66 @@ namespace MySermonsWPF
         /// <example>action: view, edit, print, delete</example>
         private void ParentContextMenuHandler(object sender, string action)
         {
-            if((sender is MenuItem menuItem) && (menuItem.Parent is ContextMenu contextMenu))
+            if ((sender is MenuItem menuItem) && (menuItem.Parent is ContextMenu contextMenu))
             {
-                if(contextMenu.PlacementTarget is TextBlock textBlock)
+                if (contextMenu.PlacementTarget is TextBlock textBlock)
                 {
                     var sortedSermon = this.FindParentInSortedList(textBlock.Tag.ToString());
-                    switch(action)
+                    switch (action)
                     {
                         case "view":
-                            foreach(var sermon in sortedSermon.Children)
+                            foreach (var sermon in sortedSermon.Children)
                             {
                                 this.ViewSermonByGuid(sermon.GUID);
                             }
                             break;
                         case "edit":
-                            foreach(var sermon in sortedSermon.Children)
+                            foreach (var sermon in sortedSermon.Children)
                             {
                                 this.EditSermonByGuid(sermon.GUID);
                             }
                             break;
                         case "print":
-                            foreach(var sermon in sortedSermon.Children)
+                            foreach (var sermon in sortedSermon.Children)
                             {
                                 this.PrintSermonByGuid(sermon.GUID);
                             }
                             break;
                         case "delete":
-                            foreach(var sermon in sortedSermon.Children)
+                            foreach (var sermon in sortedSermon.Children)
                             {
                                 this.DeleteSermonByGuid(sermon.GUID);
                             }
                             break;
                     }
                 }
-                else if(contextMenu.PlacementTarget is TreeView treeView)
+                else if (contextMenu.PlacementTarget is TreeView treeView)
                 {
                     var sortedSermons = treeView.ItemsSource;
-                    foreach(SortedSermons sortedSermon in sortedSermons)
+                    foreach (SortedSermons sortedSermon in sortedSermons)
                     {
-                        switch(action)
+                        switch (action)
                         {
                             case "view":
-                                foreach(var sermon in sortedSermon.Children)
+                                foreach (var sermon in sortedSermon.Children)
                                 {
                                     this.ViewSermonByGuid(sermon.GUID);
                                 }
                                 break;
                             case "edit":
-                                foreach(var sermon in sortedSermon.Children)
+                                foreach (var sermon in sortedSermon.Children)
                                 {
                                     this.EditSermonByGuid(sermon.GUID);
                                 }
                                 break;
                             case "print":
-                                foreach(var sermon in sortedSermon.Children)
+                                foreach (var sermon in sortedSermon.Children)
                                 {
                                     this.PrintSermonByGuid(sermon.GUID);
                                 }
                                 break;
                             case "delete":
-                                foreach(var sermon in sortedSermon.Children)
+                                foreach (var sermon in sortedSermon.Children)
                                 {
                                     this.DeleteSermonByGuid(sermon.GUID);
                                 }
@@ -308,6 +309,48 @@ namespace MySermonsWPF
                         }
                     }
                 }
+            }
+        }
+
+        private void SortByTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (e.Source is MenuItem menuItem)
+            {
+                SermonFilters filter;
+                switch (menuItem.Header)
+                {
+                    case "Date":
+                        filter = SermonFilters.Date;
+                        break;
+                    case "Location":
+                    default:
+                        filter = SermonFilters.Location;
+                        break;
+                    case "Speaker":
+                        filter = SermonFilters.Speaker;
+                        break;
+                    case "Theme":
+                        filter = SermonFilters.Theme;
+                        break;
+                    case "Title":
+                        filter = SermonFilters.Title;
+                        break;
+                }
+                this.SortSermons(filter);
+            }
+        }
+        private void SortSermons(SermonFilters filter)
+        {
+            List<Sermon> list = new List<Sermon>();
+            foreach (SortedSermons item in Sermons)
+            {
+                list.AddRange(item.Children);
+            }
+            List<SortedSermons> list2 = Sermon.Sort(filter, list);
+            Sermons.Clear();
+            foreach (SortedSermons item in list2)
+            {
+                Sermons.Add(item);
             }
         }
     }

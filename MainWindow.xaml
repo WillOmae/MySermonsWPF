@@ -10,6 +10,8 @@
         Title="MySermons"
         Height="450"
         Width="800"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
         MinHeight="300"
         MinWidth="720">
     <Window.Resources>
@@ -22,6 +24,13 @@
             <MenuItem Header="Edit all" Click="EditAllTreeViewContextMenu_Click"/>
             <MenuItem Header="Print all" Click="PrintAllTreeViewContextMenu_Click"/>
             <MenuItem Header="Delete all" Click="DeleteAllTreeViewContextMenu_Click"/>
+            <MenuItem Header="Sort by...">
+                <MenuItem Header="Date" Click="SortByTreeViewContextMenu_Click"/>
+                <MenuItem Header="Location" Click="SortByTreeViewContextMenu_Click"/>
+                <MenuItem Header="Speaker" Click="SortByTreeViewContextMenu_Click"/>
+                <MenuItem Header="Theme" Click="SortByTreeViewContextMenu_Click"/>
+                <MenuItem Header="Title" Click="SortByTreeViewContextMenu_Click"/>
+            </MenuItem>
         </ContextMenu>
         <ContextMenu x:Key="ChildContextMenu">
             <MenuItem Header="View" Click="ViewTreeViewContextMenu_Click"/>
