@@ -14,13 +14,19 @@ namespace MySermonsWPF
     /// </summary>
     public partial class MainWindow : Window
     {
+        public List<Sermon> allSermons;
         public static ObservableCollection<SortedSermons> Sermons { get; set; }
+        public static List<string> Filters { get; set; }
         public MainWindow()
         {
             if (Database.Initialise())
             {
-                Sermons = new ObservableCollection<SortedSermons>(Sermon.Sort(SermonFilters.Location, Sermon.Read()));
-
+                allSermons = Sermon.Read();
+                Sermons = new ObservableCollection<SortedSermons>(Sermon.Sort(SermonFilters.Location, allSermons));
+                Filters = new List<string>()
+                {
+                    "Date","Location","Speaker","Theme","Title"
+                };
                 this.InitializeComponent();
                 this.BaseTabControl.Items.Add(new TabItem()
                 {
@@ -311,46 +317,51 @@ namespace MySermonsWPF
                 }
             }
         }
-
-        private void SortByTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
+        private void SortSermons(string filterString)
         {
-            if (e.Source is MenuItem menuItem)
+            SermonFilters filter;
+            switch (filterString)
             {
-                SermonFilters filter;
-                switch (menuItem.Header)
-                {
-                    case "Date":
-                        filter = SermonFilters.Date;
-                        break;
-                    case "Location":
-                    default:
-                        filter = SermonFilters.Location;
-                        break;
-                    case "Speaker":
-                        filter = SermonFilters.Speaker;
-                        break;
-                    case "Theme":
-                        filter = SermonFilters.Theme;
-                        break;
-                    case "Title":
-                        filter = SermonFilters.Title;
-                        break;
-                }
-                this.SortSermons(filter);
+                case "Date":
+                    filter = SermonFilters.Date;
+                    break;
+                case "Location":
+                default:
+                    filter = SermonFilters.Location;
+                    break;
+                case "Speaker":
+                    filter = SermonFilters.Speaker;
+                    break;
+                case "Theme":
+                    filter = SermonFilters.Theme;
+                    break;
+                case "Title":
+                    filter = SermonFilters.Title;
+                    break;
             }
+            this.SortSermons(filter);
         }
         private void SortSermons(SermonFilters filter)
         {
-            List<Sermon> list = new List<Sermon>();
-            foreach (SortedSermons item in Sermons)
-            {
-                list.AddRange(item.Children);
-            }
-            List<SortedSermons> list2 = Sermon.Sort(filter, list);
+            List<SortedSermons> list = Sermon.Sort(filter, allSermons);
             Sermons.Clear();
-            foreach (SortedSermons item in list2)
+            foreach (SortedSermons item in list)
             {
                 Sermons.Add(item);
+            }
+        }
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 1)
+            {
+                SortSermons(e.AddedItems[0].ToString());
+            }
+        }
+        private void SortByMenuItem_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if(e.Source is TextBlock textBlock)
+            {
+                this.SortSermons(textBlock.Text);
             }
         }
     }

@@ -18,18 +18,23 @@
         <Style x:Key="MajorControlStyle" TargetType="Control">
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="0"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
         </Style>
         <ContextMenu x:Key="ParentContextMenu">
             <MenuItem Header="View all" Click="ViewAllTreeViewContextMenu_Click"/>
             <MenuItem Header="Edit all" Click="EditAllTreeViewContextMenu_Click"/>
             <MenuItem Header="Print all" Click="PrintAllTreeViewContextMenu_Click"/>
             <MenuItem Header="Delete all" Click="DeleteAllTreeViewContextMenu_Click"/>
-            <MenuItem Header="Sort by...">
-                <MenuItem Header="Date" Click="SortByTreeViewContextMenu_Click"/>
-                <MenuItem Header="Location" Click="SortByTreeViewContextMenu_Click"/>
-                <MenuItem Header="Speaker" Click="SortByTreeViewContextMenu_Click"/>
-                <MenuItem Header="Theme" Click="SortByTreeViewContextMenu_Click"/>
-                <MenuItem Header="Title" Click="SortByTreeViewContextMenu_Click"/>
+            <MenuItem Header="Sort by..." ItemsSource="{x:Static local:MainWindow.Filters}">
+                <MenuItem.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}"
+                                   Margin="0"
+                                   Padding="0"
+                                   PreviewMouseUp="SortByMenuItem_PreviewMouseUp"/>
+                    </DataTemplate>
+                </MenuItem.ItemTemplate>
             </MenuItem>
         </ContextMenu>
         <ContextMenu x:Key="ChildContextMenu">
@@ -76,29 +81,60 @@
                 Ready!
             </TextBlock>
         </StatusBar>
-        <TreeView x:Name="BaseTreeview"
-                  DockPanel.Dock="Left"
-                  Width="150"
-                  ItemsSource="{x:Static local:MainWindow.Sermons}"
-                  Style="{StaticResource MajorControlStyle}"
-                  ContextMenu="{StaticResource ParentContextMenu}">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type data:SortedSermons}"
+        <Grid DockPanel.Dock="Left"
+              Width="150">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="20*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal"
+                        Grid.Row="0"
+                        Width="150">
+                <TextBlock Text="Sort by "
+                           Height="20"
+                           Width="50"
+                           VerticalAlignment="Center"
+                           Padding="5 0"/>
+                <ComboBox Height="20"
+                          Width="100"
+                          ItemsSource="{x:Static local:MainWindow.Filters}"
+                          SelectionChanged="ComboBox_SelectionChanged"
+                          VerticalContentAlignment="Center"
+                          HorizontalContentAlignment="Left">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}"
+                                       Margin="0"
+                                       Padding="0"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+            <TreeView x:Name="BaseTreeview"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="2"
+                      Grid.Row="1"
+                      ItemsSource="{x:Static local:MainWindow.Sermons}"
+                      Style="{StaticResource MajorControlStyle}"
+                      ContextMenu="{StaticResource ParentContextMenu}">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type data:SortedSermons}"
                                           ItemsSource="{Binding Path=Children}">
-                    <TextBlock Text="{Binding Path=Parent}"
+                        <TextBlock Text="{Binding Path=Parent}"
                                Tag="{Binding Path=Parent}"
                                ContextMenu="{StaticResource ParentContextMenu}"/>
-                    <HierarchicalDataTemplate.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Path=Title}"
+                        <HierarchicalDataTemplate.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Title}"
                                        Tag="{Binding Path=GUID}"
                                        MouseDown="TreeViewEntry_MouseDown"
                                        ContextMenu="{StaticResource ChildContextMenu}"/>
-                        </DataTemplate>
-                    </HierarchicalDataTemplate.ItemTemplate>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+                            </DataTemplate>
+                        </HierarchicalDataTemplate.ItemTemplate>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </Grid>
         <custom:MSTabControl x:Name="BaseTabControl"
                              Style="{StaticResource MajorControlStyle}">
 
