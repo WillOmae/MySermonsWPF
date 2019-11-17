@@ -1,5 +1,9 @@
-﻿using System.Windows;
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using MySermonsWPF.Data;
 
@@ -8,13 +12,9 @@ namespace MySermonsWPF.UI
     /// <summary>
     /// Interaction logic for Viewer.xaml
     /// </summary>
-    public partial class MSViewer:UserControl
+    public partial class MSViewer : UserControl
     {
         private Sermon sermon;
-        /// <summary>
-        /// Rich text document manager.
-        /// </summary>
-        private MSDocumentManager documentManager;
         /// <summary>
         /// Viewer title string.
         /// </summary>
@@ -36,11 +36,11 @@ namespace MySermonsWPF.UI
         {
             get
             {
-                return this.documentManager.GetRichText(DataFormats.Rtf);
+                return GetRichText(DataFormats.Rtf);
             }
             private set
             {
-                this.documentManager.SetRichText(value, DataFormats.Rtf);
+                SetRichText(value, DataFormats.Rtf);
             }
         }
         /// <summary>
@@ -50,9 +50,8 @@ namespace MySermonsWPF.UI
         public MSViewer(Sermon sermon) : base()
         {
             this.InitializeComponent();
-            this.documentManager = new MSDocumentManager(this.BaseViewerContent);
             this.sermon = sermon;
-            if(sermon != null)
+            if (sermon != null)
             {
                 this.ViewerTitle = this.sermon.Title;
                 this.ViewerContent = this.sermon.Content;
@@ -61,6 +60,49 @@ namespace MySermonsWPF.UI
         public Sermon GetSermon()
         {
             return sermon;
+        }
+        /// <summary>
+        /// Convert the RichTextBox text into rich text in a specified format (currently rtf).
+        /// </summary>
+        /// <returns>A string representation of the rich text.</returns>
+        public string GetRichText(string dataFormat)
+        {
+            TextRange textRange = new TextRange(this.BaseViewerContent.Document.ContentStart, this.BaseViewerContent.Document.ContentEnd);
+            if (textRange.Text.Trim().Length > 0)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    textRange.Save(stream, dataFormat);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    StringBuilder stringBuilder = new StringBuilder();
+                    int b;
+                    while ((b = stream.ReadByte()) != -1)
+                    {
+                        stringBuilder.Append(Convert.ToChar(b));
+                    }
+                    return stringBuilder.ToString();
+                }
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Sets the RichTextBox text from rich text in a specified format (currently rtf).
+        /// </summary>
+        /// <param name="richText">The string representation of the rich text.</param>
+        public void SetRichText(string richText, string dataFormat)
+        {
+            if (!string.IsNullOrEmpty(richText))
+            {
+                using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(richText)))
+                {
+                    TextRange textRange = new TextRange(this.BaseViewerContent.Document.ContentStart, this.BaseViewerContent.Document.ContentEnd);
+                    textRange.Load(stream, dataFormat);
+                }
+            }
         }
         private void PrintCommandExecuted(object target, ExecutedRoutedEventArgs e)
         {
@@ -72,7 +114,7 @@ namespace MySermonsWPF.UI
         }
         private void DeleteCommandExecuted(object target, ExecutedRoutedEventArgs e)
         {
-            if(this.sermon.Delete())
+            if (this.sermon.Delete())
             {
                 MessageBox.Show("Deleting...");
             }
