@@ -551,9 +551,9 @@ namespace MySermonsWPF.Data
                     if (themes == null) break;
                     foreach (Theme theme in themes)
                     {
-                        AddToSortedList(ref sortedSermons, theme.Name, from sermon in sermons
-                                                                       where sermon.Themes != null && sermon.Themes.Contains(theme)
-                                                                       select sermon);
+                        AddToSortedList(ref sortedSermons,
+                                        theme.Name,
+                                        sermons.Where(sermon => sermon.Themes != null && sermon.Themes.Find(x => x.Name == theme.Name) != null).Select(sermon => sermon).ToList());
                     }
                     break;
                 case SermonFilters.Speaker:
@@ -561,9 +561,9 @@ namespace MySermonsWPF.Data
                     if (speakers == null) break;
                     foreach (Speaker speaker in speakers)
                     {
-                        AddToSortedList(ref sortedSermons, speaker.Name, from sermon in sermons
-                                                                         where sermon.Speakers != null && sermon.Speakers.Contains(speaker)
-                                                                         select sermon);
+                        AddToSortedList(ref sortedSermons,
+                                        speaker.Name,
+                                        sermons.Where(sermon => sermon.Speakers != null && sermon.Speakers.Find(x => x.Name == speaker.Name) != null).Select(sermon => sermon).ToList());
                     }
                     break;
             }
