@@ -1,11 +1,13 @@
 ﻿using MySermonsWPF.Data;
 using MySermonsWPF.UI;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace MySermonsWPF
 {
@@ -17,6 +19,9 @@ namespace MySermonsWPF
         public List<Sermon> allSermons;
         public static ObservableCollection<SortedSermons> SermonsToDisplay { get; set; }
         public static List<string> Filters { get; set; }
+        public static List<string> ChildContextMenuItems { get; set; }
+        public static List<string> ParentContextMenuItems { get; set; }
+        public static FontFamily ControlFont => MyFonts.Find(ff => ff.FamilyNames.Values.Contains("Ubuntu"));
         public SermonFilters CurrentFilter
         {
             get
@@ -30,6 +35,7 @@ namespace MySermonsWPF
             }
         }
         private SermonFilters currentFilter = SermonFilters.Location;
+        private static readonly List<FontFamily> MyFonts = Fonts.GetFontFamilies(new Uri("pack://application:,,,/"), "/UI/Resources/Fonts/").ToList();
         public MainWindow()
         {
             if (Database.Initialise())
@@ -39,6 +45,10 @@ namespace MySermonsWPF
                 Filters = new List<string>()
                 {
                     "Date", "Location", "Speaker", "Theme", "Title"
+                };
+                ChildContextMenuItems = new List<string>()
+                {
+                    "View", "Edit", "Print", "Delete"
                 };
                 this.InitializeComponent();
                 this.BaseComboBoxFilters.SelectedIndex = 1;
@@ -117,10 +127,7 @@ namespace MySermonsWPF
         /// <returns>A sermon or null.</returns>
         private Sermon FindChildInSortedListByGuid(string guid)
         {
-            return (from x in SermonsToDisplay
-                    from y in x.Children
-                    where y.GUID.Equals(guid)
-                    select y).FirstOrDefault();
+            return (from x in allSermons where x.GUID.Equals(guid) select x).FirstOrDefault();
         }
 
         /// <summary>
@@ -170,8 +177,10 @@ namespace MySermonsWPF
         /// <param name="e"></param>
         private void ChildTreeViewContextMenu_Click(object sender, RoutedEventArgs e)
         {
-            if ((sender is MenuItem menuItem) && (menuItem.Parent is ContextMenu contextMenu) && ((contextMenu).PlacementTarget is TextBlock textBlock))
+            if (sender is MenuItem menuItem)
             {
+                ContextMenu contextMenu = FindVisualParentOfTargetType(typeof(ContextMenu), menuItem) as ContextMenu;
+                TextBlock textBlock = contextMenu.PlacementTarget as TextBlock;
                 switch (menuItem.Header.ToString().ToLower())
                 {
                     case "view":
@@ -188,6 +197,20 @@ namespace MySermonsWPF
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Find the visual parent of the specified type of a control.
+        /// </summary>
+        /// <param name="control">The child control.</param>
+        /// <returns>The parent</returns>
+        private Control FindVisualParentOfTargetType(Type targetType, DependencyObject control)
+        {
+            do
+            {
+                control = VisualTreeHelper.GetParent(control);
+            } while (!(control.GetType() == targetType));
+            return (Control)control;
         }
 
         /// <summary>

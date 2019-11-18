@@ -13,7 +13,8 @@
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
         MinHeight="300"
-        MinWidth="720">
+        MinWidth="720"
+        FontFamily="{x:Static local:MainWindow.ControlFont}">
     <Window.Resources>
         <Style x:Key="MajorControlStyle" TargetType="Control">
             <Setter Property="Margin" Value="0"/>
@@ -37,11 +38,16 @@
                 </MenuItem.ItemTemplate>
             </MenuItem>
         </ContextMenu>
-        <ContextMenu x:Key="ChildContextMenu">
-            <MenuItem Header="View" Click="ChildTreeViewContextMenu_Click"/>
-            <MenuItem Header="Edit" Click="ChildTreeViewContextMenu_Click"/>
-            <MenuItem Header="Print" Click="ChildTreeViewContextMenu_Click"/>
-            <MenuItem Header="Delete" Click="ChildTreeViewContextMenu_Click"/>
+        <ContextMenu x:Key="ChildContextMenu"
+                     ItemsSource="{x:Static local:MainWindow.ChildContextMenuItems}">
+            <ContextMenu.ItemTemplate>
+                <DataTemplate>
+                    <MenuItem Header="{Binding}"
+                              Margin="0"
+                              Padding="0"
+                              Click="ChildTreeViewContextMenu_Click"/>
+                </DataTemplate>
+            </ContextMenu.ItemTemplate>
         </ContextMenu>
     </Window.Resources>
     <DockPanel LastChildFill="True">
@@ -90,11 +96,9 @@
             <StackPanel Orientation="Horizontal"
                         Grid.Row="0"
                         Width="150">
-                <TextBlock Text="Sort by "
-                           Height="20"
-                           Width="50"
-                           VerticalAlignment="Center"
-                           Padding="5 0"/>
+                <Border BorderBrush="{x:Null}" Height="20" Width="50">
+                    <TextBlock TextWrapping="Wrap" Padding="5 0" Text="Sort by" VerticalAlignment="Center"/>
+                </Border>
                 <ComboBox x:Name="BaseComboBoxFilters"
                           Height="20"
                           Width="100"
@@ -102,7 +106,8 @@
                           ItemsSource="{x:Static local:MainWindow.Filters}"
                           SelectionChanged="ComboBox_SelectionChanged"
                           VerticalContentAlignment="Center"
-                          HorizontalContentAlignment="Left">
+                          HorizontalContentAlignment="Left"
+                          Padding="5 0">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}"

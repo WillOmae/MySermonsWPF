@@ -244,6 +244,8 @@
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="README.md" />
+    <Resource Include="UI\Resources\Fonts\Ubuntu-R.ttf" />
+    <Resource Include="UI\Resources\Fonts\AlanisHand.ttf" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
