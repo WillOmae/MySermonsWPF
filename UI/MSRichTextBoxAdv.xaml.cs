@@ -280,7 +280,7 @@ namespace MySermonsWPF.UI
         }
         private void PrintCommandExecuted(object target, ExecutedRoutedEventArgs e)
         {
-            MessageBox.Show("printing...");
+            BaseRichTextBox.PrintDocument();
         }
         private void PrintCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -385,6 +385,16 @@ namespace MySermonsWPF.UI
                     this.ToggleMetadataPanelOpening(MetadataPanelToggle.Close);
                     break;
             }
+        }
+
+        private void DummyCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = false;
+        }
+
+        private void DummyCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
         }
     }
 }

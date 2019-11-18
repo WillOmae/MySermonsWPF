@@ -40,7 +40,10 @@
                         Executed="PrintCommandExecuted"/>
         <CommandBinding Command="commands:CustomCommands.PastePlain"
                         CanExecute="PastePlainCommandCanExecute"
-                        Executed="PastePlainCommandExecuted"/>
+                        Executed="PastePlainCommandExecuted" />
+        <CommandBinding Command="commands:CustomCommands.Dummy"
+                        CanExecute="DummyCommand_CanExecute"
+                        Executed="DummyCommand_Executed" />
     </UserControl.CommandBindings>
     
     <DockPanel LastChildFill="True">
@@ -55,12 +58,10 @@
                        Source="Resources/expand.png"/>
             </Button>
         </StackPanel>
-
-        <syncfusion:Ribbon
-            x:Name="ribbon"
-            DockPanel.Dock="Top"
-            SnapsToDevicePixels="True"
-            DataContext="{Binding ElementName=BaseRichTextBox}">
+        <syncfusion:Ribbon x:Name="ribbon"
+                           DockPanel.Dock="Top"
+                           SnapsToDevicePixels="True"
+                           DataContext="{Binding ElementName=BaseRichTextBox}">
             <syncfusion:RibbonTab Caption="Home">
                 <syncfusion:RibbonBar Header="File" IsLauncherButtonVisible="False">
                     <syncfusion:RibbonButton Margin="5" SizeForm="Large" ToolTipService.ShowOnDisabled="True" Label="Save" IsToggle="False" LargeIcon="Resources/RibbonImages/Save32.png" Command="ApplicationCommands.Save">
@@ -793,8 +794,22 @@
                 </syncfusion:RibbonBar>
             </syncfusion:RibbonTab>
         </syncfusion:Ribbon>
-        <syncfusion:SfRichTextBoxAdv
-            x:Name="BaseRichTextBox"
-            GotFocus="BaseRichTextBox_GotFocus"/>
+        <syncfusion:SfRichTextBoxAdv x:Name="BaseRichTextBox"
+                                     GotFocus="BaseRichTextBox_GotFocus">
+            <syncfusion:SfRichTextBoxAdv.InputBindings>
+                <KeyBinding Key="N"
+                            Modifiers="Ctrl"
+                            Command="commands:CustomCommands.Dummy" />
+                <KeyBinding Key="S"
+                            Modifiers="Ctrl"
+                            Command="commands:CustomCommands.Dummy" />
+                <KeyBinding Key="O"
+                            Modifiers="Ctrl"
+                            Command="commands:CustomCommands.Dummy" />
+                <KeyBinding Key="P"
+                            Modifiers="Ctrl"
+                            Command="ApplicationCommands.Print" />
+            </syncfusion:SfRichTextBoxAdv.InputBindings>
+        </syncfusion:SfRichTextBoxAdv>
     </DockPanel>
 </UserControl>
