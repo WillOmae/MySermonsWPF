@@ -23,6 +23,8 @@ namespace MySermonsWPF.UI
     /// </summary>
     public partial class MSRichTextBoxAdv : UserControl
     {
+        public static readonly List<string> InstalledFonts = Fonts.SystemFontFamilies.Select(ff => ff.FamilyNames.Values.First()).OrderBy(ff => ff).ToList();
+        public static readonly List<double> FontSizes = new List<double>() { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72 };
         /// <summary>
         /// Sermon that is to be manipulated internally.
         /// </summary>
@@ -97,6 +99,8 @@ namespace MySermonsWPF.UI
             BaseRichTextBox.KeyUp += this.BaseRichTextBox_KeyUp;
             BaseRichTextBox.PreviewMouseLeftButtonUp += this.BaseRichTextBox_PreviewMouseLeftButtonUp;
             BaseRichTextBox.PreviewMouseMove += this.BaseRichTextBox_PreviewMouseMove;
+            fontFamilyComboBox.SelectedItem = InstalledFonts.Find(ff => ff.Equals("Times New Roman"));
+            fontSizeComboBox.SelectedIndex = 2;
         }
 
         private void BaseRichTextBox_PreviewMouseMove(object sender, MouseEventArgs e)

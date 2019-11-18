@@ -28,6 +28,7 @@
         <converters:LineSpacingToggleConverter x:Key="LineSpacingToggleConverter"/>
         <converters:PercentageDoubleConverter x:Key="PercentageDoubleConverter" />
         <converters:PercentageStringConverter x:Key="PercentageStringConverter" />
+        <CollectionViewSource x:Key="FontFamiliesCollection" Source="{Binding Source={x:Static Fonts.SystemFontFamilies}}"/>
     </UserControl.Resources>
 
     <UserControl.CommandBindings>
@@ -137,14 +138,14 @@
                 </syncfusion:RibbonBar>
                 <syncfusion:RibbonBar Header="Font" IsLargeButtonPanel="False" LauncherCommand="syncfusion:SfRichTextBoxAdv.ShowFontDialogCommand">
                     <syncfusion:ButtonPanel Height="24" SeparatorVisibility="Collapsed">
-                        <syncfusion:RibbonComboBox x:Name="fontFamilyComboBox" Width="110" IsEditable="True" ToolTipService.ShowOnDisabled="True" Text="{Binding Selection.CharacterFormat.FontFamily, Mode=OneWay, Converter={StaticResource FontFamilyStringConverter}}" SelectedValue="{Binding Selection.CharacterFormat.FontFamily, Mode=TwoWay, Converter={StaticResource FontFamilyStringConverter}}">
+                        <syncfusion:RibbonComboBox x:Name="fontFamilyComboBox" Width="110" IsEditable="True" ToolTipService.ShowOnDisabled="True" Text="{Binding Selection.CharacterFormat.FontFamily, Mode=OneWay, Converter={StaticResource FontFamilyStringConverter}}" SelectedValue="{Binding Selection.CharacterFormat.FontFamily, Mode=TwoWay, Converter={StaticResource FontFamilyStringConverter}}" ItemsSource="{x:Static local:MSRichTextBoxAdv.InstalledFonts}">
                             <syncfusion:RibbonComboBox.ToolTip>
                                 <syncfusion:ScreenTip Description="FontToolTipHeader" >
                                     <TextBlock Text="FontToolTip" MaxWidth="250" TextWrapping="Wrap"/>
                                 </syncfusion:ScreenTip>
                             </syncfusion:RibbonComboBox.ToolTip>
                         </syncfusion:RibbonComboBox>
-                        <syncfusion:RibbonComboBox x:Name="fontSizeComboBox" Width="50" IsEditable="True" ToolTipService.ShowOnDisabled="True" Text="{Binding Selection.CharacterFormat.FontSize, Mode=OneWay, Converter={StaticResource DoubleStringConverter}}" SelectedValue="{Binding Selection.CharacterFormat.FontSize, Mode=TwoWay}">
+                        <syncfusion:RibbonComboBox x:Name="fontSizeComboBox" Width="50" IsEditable="True" ToolTipService.ShowOnDisabled="True" Text="{Binding Selection.CharacterFormat.FontSize, Mode=OneWay, Converter={StaticResource DoubleStringConverter}}" SelectedValue="{Binding Selection.CharacterFormat.FontSize, Mode=TwoWay}" ItemsSource="{x:Static local:MSRichTextBoxAdv.FontSizes}">
                             <syncfusion:RibbonComboBox.ToolTip>
                                 <syncfusion:ScreenTip Description="FontSizeToolTipHeader" >
                                     <TextBlock Text="FontSizeToolTip" TextWrapping="Wrap" MaxWidth="250"/>
