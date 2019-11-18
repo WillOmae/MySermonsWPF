@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:MySermonsWPF"
         xmlns:data="clr-namespace:MySermonsWPF.Data"
         xmlns:custom="clr-namespace:MySermonsWPF.UI"
+        xmlns:commands="clr-namespace:MySermonsWPF.UI.Commands"
         mc:Ignorable="d"
         Title="MySermons"
         Height="450"
@@ -15,25 +16,43 @@
         MinHeight="300"
         MinWidth="720"
         FontFamily="{x:Static local:MainWindow.ControlFont}">
+    <Window.CommandBindings>
+        <CommandBinding Command="commands:CustomCommands.Exit"
+                        CanExecute="ExitCommand_CanExecute"
+                        Executed="ExitCommand_Executed" />
+        <CommandBinding Command="ApplicationCommands.New"
+                        CanExecute="NewCommand_CanExecute"
+                        Executed="NewCommand_Executed" />
+    </Window.CommandBindings>
     <Window.Resources>
-        <Style x:Key="MajorControlStyle" TargetType="Control">
-            <Setter Property="Margin" Value="0"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
+        <Style x:Key="MajorControlStyle"
+               TargetType="Control">
+            <Setter Property="Margin"
+                    Value="0" />
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="BorderBrush"
+                    Value="Transparent" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
         </Style>
         <ContextMenu x:Key="ParentContextMenu">
-            <MenuItem Header="View all" Click="ParentTreeViewContextMenu_Click"/>
-            <MenuItem Header="Edit all" Click="ParentTreeViewContextMenu_Click"/>
-            <MenuItem Header="Print all" Click="ParentTreeViewContextMenu_Click"/>
-            <MenuItem Header="Delete all" Click="ParentTreeViewContextMenu_Click"/>
-            <MenuItem Header="Sort by..." ItemsSource="{x:Static local:MainWindow.Filters}">
+            <MenuItem Header="View all"
+                      Click="ParentTreeViewContextMenu_Click" />
+            <MenuItem Header="Edit all"
+                      Click="ParentTreeViewContextMenu_Click" />
+            <MenuItem Header="Print all"
+                      Click="ParentTreeViewContextMenu_Click" />
+            <MenuItem Header="Delete all"
+                      Click="ParentTreeViewContextMenu_Click" />
+            <MenuItem Header="Sort by..."
+                      ItemsSource="{x:Static local:MainWindow.Filters}">
                 <MenuItem.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding}"
                                    Margin="0"
                                    Padding="0"
-                                   PreviewMouseUp="SortByMenuItem_PreviewMouseUp"/>
+                                   PreviewMouseUp="SortByMenuItem_PreviewMouseUp" />
                     </DataTemplate>
                 </MenuItem.ItemTemplate>
             </MenuItem>
@@ -45,7 +64,7 @@
                     <MenuItem Header="{Binding}"
                               Margin="0"
                               Padding="0"
-                              Click="ChildTreeViewContextMenu_Click"/>
+                              Click="ChildTreeViewContextMenu_Click" />
                 </DataTemplate>
             </ContextMenu.ItemTemplate>
         </ContextMenu>
@@ -56,49 +75,59 @@
               Style="{StaticResource MajorControlStyle}"
               FontFamily="{x:Static local:MainWindow.ControlFont}">
             <MenuItem Header="File">
-                <MenuItem Header="New"/>
-                <Separator/>
-                <MenuItem Header="Close"/>
-                <MenuItem Header="Close all"/>
-                <Separator/>
-                <MenuItem Header="Print"/>
+                <MenuItem Header="New"
+                          Command="ApplicationCommands.New" />
+                <Separator />
+                <MenuItem Header="Print"
+                          Command="ApplicationCommands.Print" />
+                <MenuItem Header="Close"
+                          Command="ApplicationCommands.Close" />
+                <MenuItem Header="Close all"
+                          Command="commands:CustomCommands.CloseAll" />
+                <Separator />
+                <MenuItem Header="Exit"
+                          Command="commands:CustomCommands.Exit" />
             </MenuItem>
             <MenuItem Header="Edit">
-                <MenuItem Header="Redo"/>
-                <MenuItem Header="Undo"/>
-                <Separator/>
-                <MenuItem Header="Copy"/>
-                <MenuItem Header="Cut"/>
-                <MenuItem Header="Paste"/>
+                <MenuItem Header="Redo" />
+                <MenuItem Header="Undo" />
+                <Separator />
+                <MenuItem Header="Copy" />
+                <MenuItem Header="Cut" />
+                <MenuItem Header="Paste" />
             </MenuItem>
             <MenuItem Header="Options">
-                <MenuItem Header="Customise"/>
-                <MenuItem Header="Import"/>
+                <MenuItem Header="Customise" />
+                <MenuItem Header="Import" />
             </MenuItem>
             <MenuItem Header="Help">
-                <MenuItem Header="Help"/>
-                <MenuItem Header="Update"/>
-                <MenuItem Header="About"/>
+                <MenuItem Header="Help" />
+                <MenuItem Header="Update" />
+                <MenuItem Header="About" />
             </MenuItem>
         </Menu>
         <StatusBar x:Name="BaseStatusBar"
                    DockPanel.Dock="Bottom"
                    Style="{StaticResource MajorControlStyle}">
             <TextBlock>
-                Ready!
-            </TextBlock>
+                Ready!</TextBlock>
         </StatusBar>
         <Grid DockPanel.Dock="Left"
               Width="150">
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="20*"/>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="20*" />
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal"
                         Grid.Row="0"
                         Width="150">
-                <Border BorderBrush="{x:Null}" Height="20" Width="50">
-                    <TextBlock TextWrapping="Wrap" Padding="5 0" Text="Sort by" VerticalAlignment="Center"/>
+                <Border BorderBrush="{x:Null}"
+                        Height="20"
+                        Width="50">
+                    <TextBlock TextWrapping="Wrap"
+                               Padding="5 0"
+                               Text="Sort by"
+                               VerticalAlignment="Center" />
                 </Border>
                 <ComboBox x:Name="BaseComboBoxFilters"
                           Height="20"
@@ -114,7 +143,7 @@
                             <TextBlock Text="{Binding}"
                                        Margin="0"
                                        Padding="0"
-                                       HorizontalAlignment="Stretch"/>
+                                       HorizontalAlignment="Stretch" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
@@ -128,16 +157,16 @@
                       ContextMenu="{StaticResource ParentContextMenu}">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type data:SortedSermons}"
-                                          ItemsSource="{Binding Path=Children}">
+                                              ItemsSource="{Binding Path=Children}">
                         <TextBlock Text="{Binding Path=Parent}"
-                               Tag="{Binding Path=Parent}"
-                               ContextMenu="{StaticResource ParentContextMenu}"/>
+                                   Tag="{Binding Path=Parent}"
+                                   ContextMenu="{StaticResource ParentContextMenu}" />
                         <HierarchicalDataTemplate.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=Title}"
-                                       Tag="{Binding Path=GUID}"
-                                       MouseDown="TreeViewEntry_MouseDown"
-                                       ContextMenu="{StaticResource ChildContextMenu}"/>
+                                           Tag="{Binding Path=GUID}"
+                                           MouseDown="TreeViewEntry_MouseDown"
+                                           ContextMenu="{StaticResource ChildContextMenu}" />
                             </DataTemplate>
                         </HierarchicalDataTemplate.ItemTemplate>
                     </HierarchicalDataTemplate>
@@ -145,8 +174,6 @@
             </TreeView>
         </Grid>
         <custom:MSTabControl x:Name="BaseTabControl"
-                             Style="{StaticResource MajorControlStyle}">
-
-        </custom:MSTabControl>
+                             Style="{StaticResource MajorControlStyle}"></custom:MSTabControl>
     </DockPanel>
 </Window>

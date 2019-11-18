@@ -16,7 +16,7 @@ namespace MySermonsWPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        public List<Sermon> allSermons;
+        public List<Sermon> AllSermons;
         public static ObservableCollection<SortedSermons> SermonsToDisplay { get; set; }
         public static List<string> Filters { get; set; }
         public static List<string> ChildContextMenuItems { get; set; }
@@ -40,7 +40,7 @@ namespace MySermonsWPF
         {
             if (Database.Initialise())
             {
-                allSermons = Sermon.Read();
+                AllSermons = Sermon.Read();
                 SermonsToDisplay = new ObservableCollection<SortedSermons>();
                 Filters = new List<string>()
                 {
@@ -52,11 +52,6 @@ namespace MySermonsWPF
                 };
                 this.InitializeComponent();
                 this.BaseComboBoxFilters.SelectedIndex = 1;
-                this.BaseTabControl.Items.Add(new TabItem()
-                {
-                    Header = "New document",
-                    Content = new MSRichTextBoxAdv(null)
-                });
             }
             else
             {
@@ -127,7 +122,7 @@ namespace MySermonsWPF
         /// <returns>A sermon or null.</returns>
         private Sermon FindChildInSortedListByGuid(string guid)
         {
-            return (from x in allSermons where x.GUID.Equals(guid) select x).FirstOrDefault();
+            return (from x in AllSermons where x.GUID.Equals(guid) select x).FirstOrDefault();
         }
 
         /// <summary>
@@ -162,7 +157,7 @@ namespace MySermonsWPF
         /// </summary>
         private void SortSermons()
         {
-            List<SortedSermons> list = Sermon.Sort(CurrentFilter, allSermons);
+            List<SortedSermons> list = Sermon.Sort(CurrentFilter, AllSermons);
             SermonsToDisplay.Clear();
             foreach (SortedSermons item in list)
             {
@@ -296,6 +291,52 @@ namespace MySermonsWPF
             {
                 this.SetCurrentFilter(textBlock.Text);
             }
+        }
+
+        /// <summary>
+        /// Event handler for exit command: check if can execute command.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExitCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        /// <summary>
+        /// Event handler for exit command: what to do once executed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExitCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        /// <summary>
+        /// Event handler for new command: check if can execute command.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NewCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        /// <summary>
+        /// Event handler for new command: what to do once executed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            TabItem tabItem = new TabItem()
+            {
+                Header = "New document",
+                Content = new MSRichTextBoxAdv(null)
+            };
+            this.BaseTabControl.Items.Add(tabItem);
+            this.BaseTabControl.SetSelectedItem(tabItem);
         }
     }
 }
