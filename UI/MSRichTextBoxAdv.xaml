@@ -139,6 +139,11 @@
                 <syncfusion:RibbonBar Header="Font" IsLargeButtonPanel="False" LauncherCommand="syncfusion:SfRichTextBoxAdv.ShowFontDialogCommand">
                     <syncfusion:ButtonPanel Height="24" SeparatorVisibility="Collapsed">
                         <syncfusion:RibbonComboBox x:Name="fontFamilyComboBox" Width="110" IsEditable="True" ToolTipService.ShowOnDisabled="True" Text="{Binding Selection.CharacterFormat.FontFamily, Mode=OneWay, Converter={StaticResource FontFamilyStringConverter}}" SelectedValue="{Binding Selection.CharacterFormat.FontFamily, Mode=TwoWay, Converter={StaticResource FontFamilyStringConverter}}" ItemsSource="{x:Static local:MSRichTextBoxAdv.InstalledFonts}">
+                            <syncfusion:RibbonComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontFamily="{Binding}" Height="20"/>
+                                </DataTemplate>
+                            </syncfusion:RibbonComboBox.ItemTemplate>
                             <syncfusion:RibbonComboBox.ToolTip>
                                 <syncfusion:ScreenTip Description="FontToolTipHeader" >
                                     <TextBlock Text="FontToolTip" MaxWidth="250" TextWrapping="Wrap"/>

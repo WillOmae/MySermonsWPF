@@ -98,7 +98,7 @@ namespace MySermonsWPF.UI
             }
             BaseRichTextBox.KeyUp += this.BaseRichTextBox_KeyUp;
             BaseRichTextBox.PreviewMouseLeftButtonUp += this.BaseRichTextBox_PreviewMouseLeftButtonUp;
-            BaseRichTextBox.PreviewMouseMove += this.BaseRichTextBox_PreviewMouseMove;
+            //BaseRichTextBox.PreviewMouseMove += this.BaseRichTextBox_PreviewMouseMove;
             fontFamilyComboBox.SelectedItem = InstalledFonts.Find(ff => ff.Equals("Times New Roman"));
             fontSizeComboBox.SelectedIndex = 2;
         }

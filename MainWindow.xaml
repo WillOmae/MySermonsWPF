@@ -53,7 +53,8 @@
     <DockPanel LastChildFill="True">
         <Menu x:Name="BaseMenuBar"
               DockPanel.Dock="Top"
-              Style="{StaticResource MajorControlStyle}">
+              Style="{StaticResource MajorControlStyle}"
+              FontFamily="{x:Static local:MainWindow.ControlFont}">
             <MenuItem Header="File">
                 <MenuItem Header="New"/>
                 <Separator/>
