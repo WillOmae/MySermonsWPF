@@ -609,6 +609,7 @@ namespace MySermonsWPF.Data
 
         public bool Equals(Sermon test)
         {
+            if (test == null) return false;
             return this.Content == test.Content && this.Title == test.Title && this.DateCreated == test.DateCreated;
         }
     }

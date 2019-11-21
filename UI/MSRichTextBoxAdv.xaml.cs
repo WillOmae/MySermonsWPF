@@ -25,6 +25,8 @@ namespace MySermonsWPF.UI
     {
         public static readonly List<string> InstalledFonts = Fonts.SystemFontFamilies.Select(ff => ff.FamilyNames.Values.First()).OrderBy(ff => ff).ToList();
         public static readonly List<double> FontSizes = new List<double>() { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72 };
+
+        private static readonly SfRichTextBoxAdv sfRichTextBoxAdv = new SfRichTextBoxAdv();
         /// <summary>
         /// Sermon that is to be manipulated internally.
         /// </summary>
@@ -280,7 +282,118 @@ namespace MySermonsWPF.UI
         }
         private void PrintCommandExecuted(object target, ExecutedRoutedEventArgs e)
         {
-            BaseRichTextBox.PrintDocument();
+            if (this.BaseMetadataPanel.Verify())
+            {
+                char themeDelimiter = ',';
+                (string title, string speakers, string keytext, string location, string themes, string otherinfo) metadata = this.BaseMetadataPanel.GetMetadata();
+
+                List<Theme> themes = string.IsNullOrEmpty(metadata.themes) ? null : Theme.ExtractFromDelimitedString(metadata.themes, themeDelimiter);
+                List<Speaker> speakers = string.IsNullOrEmpty(metadata.speakers) ? null : Speaker.ExtractFromDelimitedString(metadata.speakers, themeDelimiter);
+                string title = string.IsNullOrEmpty(metadata.title) ? null : metadata.title;
+                string keyText = string.IsNullOrEmpty(metadata.keytext) ? null : metadata.keytext;
+
+                string line1 = null;
+                if (!string.IsNullOrEmpty(title))
+                {
+                    line1 = title;
+                }
+                StringBuilder line2 = new StringBuilder();
+                if (speakers != null)
+                {
+                    line2.Append("by ");
+                    foreach (var speaker in speakers.Where(speaker => speaker.Name != "SPEAKER_NOT_SET").Select(speaker => speaker))
+                    {
+                        line2.Append(speaker.Name).Append(", ");
+                    }
+                    int len = line2.Length;
+                    if (line2[len - 2] == ',' && line2[len - 1] == ' ')
+                    {
+                        line2.Remove(len - 2, 2);
+                    }
+                }
+                if (!string.IsNullOrEmpty(keyText))
+                {
+                    line2.Append(" based on ");
+                    line2.Append(keyText);
+                }
+                string date = "18/11/2019";
+                string place = "Eldoret";
+                StringBuilder line3 = new StringBuilder();
+                if (!string.IsNullOrEmpty(place))
+                {
+                    line3.Append("at ");
+                    line3.Append(place);
+                }
+                if (!string.IsNullOrEmpty(date))
+                {
+                    line3.Append(" on ");
+                    line3.Append(date);
+                }
+                string topics = "salvation, eschatology, christology";
+                StringBuilder line4 = new StringBuilder();
+                if (!string.IsNullOrEmpty(topics))
+                {
+                    line4.Append(topics);
+                }
+
+                SpanAdv span1 = new SpanAdv
+                {
+                    Text = line1
+                };
+                span1.CharacterFormat.Bold = true;
+                span1.CharacterFormat.Italic = true;
+                span1.CharacterFormat.FontSize = 20;
+                SpanAdv span2 = new SpanAdv
+                {
+                    Text = line2.ToString()
+                };
+                span2.CharacterFormat.Italic = true;
+                span2.CharacterFormat.FontSize = 18;
+                SpanAdv span3 = new SpanAdv
+                {
+                    Text = line3.ToString()
+                };
+                span3.CharacterFormat.Italic = true;
+                span3.CharacterFormat.FontSize = 18;
+                SpanAdv span4 = new SpanAdv
+                {
+                    Text = line4.ToString()
+                };
+                span4.CharacterFormat.Italic = true;
+                span4.CharacterFormat.FontSize = 18;
+
+
+                ParagraphAdv para1 = new ParagraphAdv();
+                para1.Inlines.Add(span1);
+                para1.ParagraphFormat.AfterSpacing = 10;
+                para1.ParagraphFormat.TextAlignment = TextAlignment.Center;
+                ParagraphAdv para2 = new ParagraphAdv();
+                para2.Inlines.Add(span2);
+                para2.ParagraphFormat.TextAlignment = TextAlignment.Center;
+                ParagraphAdv para3 = new ParagraphAdv();
+                para3.Inlines.Add(span3);
+                para3.ParagraphFormat.TextAlignment = TextAlignment.Center;
+                ParagraphAdv para4 = new ParagraphAdv();
+                para4.Inlines.Add(span4);
+                para4.ParagraphFormat.TextAlignment = TextAlignment.Center;
+
+                // prevents rtb blackening when assigning documents
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    BaseRichTextBox.Save(memoryStream, FormatType.Rtf);
+                    sfRichTextBoxAdv.Load(memoryStream, FormatType.Rtf);
+                }
+                sfRichTextBoxAdv.Document.Sections[0].Blocks.Insert(0, para1);
+                sfRichTextBoxAdv.Document.Sections[0].Blocks.Insert(1, para2);
+                sfRichTextBoxAdv.Document.Sections[0].Blocks.Insert(2, para3);
+                sfRichTextBoxAdv.Document.Sections[0].Blocks.Insert(3, para4);
+                sfRichTextBoxAdv.PrintDocument();
+            }
+            else
+            {
+                this.ToggleMetadataPanelOpening(MetadataPanelToggle.Open);
+                MessageBox.Show("Specify sermon title", "Title not set", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
         }
         private void PrintCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -320,16 +433,20 @@ namespace MySermonsWPF.UI
         }
         private void SetUpEditor()
         {
-            StringBuilder themesBuilder = new StringBuilder();
-            foreach (var theme in this.sermon.Themes)
+            StringBuilder builder = new StringBuilder();
+            foreach (var theme in this.sermon.Themes.Where(theme => theme.Name != "THEME_NOT_SET").Select(theme => theme))
             {
-                if (theme.Name != "THEME_NOT_SET")
-                {
-                    themesBuilder = themesBuilder.Append(theme.Name).Append(", ");
-                }
+                builder = builder.Append(theme.Name).Append(", ");
             }
-            string themes = themesBuilder.ToString().TrimEnd(',', ' ');
-            this.BaseMetadataPanel.Populate(this.sermon.Title, null, this.sermon.KeyVerse, this.sermon.Location.Name, themes, this.sermon.OtherMetaData);
+            string themes = builder.ToString().TrimEnd(',', ' ');
+            builder.Clear();
+            foreach (var speaker in this.sermon.Speakers.Where(speaker => speaker.Name != "SPEAKER_NOT_SET").Select(speaker => speaker))
+            {
+                builder = builder.Append(speaker.Name).Append(", ");
+            }
+
+            string speakers = builder.ToString().TrimEnd(',', ' ');
+            this.BaseMetadataPanel.Populate(this.sermon.Title, speakers, this.sermon.KeyVerse, this.sermon.Location.Name, themes, this.sermon.OtherMetaData);
             SetRTBContents(FormatType.Rtf, this.sermon.Content == "CONTENT_NOT_SET" ? string.Empty : this.sermon.Content);
         }
         private void Save()
