@@ -1,4 +1,8 @@
-﻿using System;
+﻿using DiffPlex;
+using DiffPlex.Model;
+using MySermonsWPF.Data;
+using MySermonsWPF.Data.Bible;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,10 +15,6 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using DiffPlex;
-using DiffPlex.Model;
-using MySermonsWPF.Data;
-using MySermonsWPF.Data.Bible;
 
 namespace MySermonsWPF.UI
 {
@@ -87,25 +87,27 @@ namespace MySermonsWPF.UI
             this.combinedRegex = new Regex(regexBCVrBCV + "|" + regexBCrBC + "|" + regexBCVrCV + "|" + regexBCrC + "|" + regexBCVrV + "|" + regexBCV + "|" + regexBC, RegexOptions.Compiled);
             this.differ = new Differ();
         }
-
         /// <summary>
-        /// Event handler when all controls have been loaded.
+        /// Set the properties of buttons in bulk.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MSRichTextBoxLoaded(object sender, RoutedEventArgs e)
+        private void SetButtonsProperties()
         {
-            this.SetButtonsProperties();
-            this.RTBFontSize.ItemsSource = new double[] { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72 };
-            this.RTBFontSize.SelectedItem = 12D;
-            this.RTBFont.ItemsSource = Fonts.SystemFontFamilies.Select(ff => ff.FamilyNames.Values.First()).OrderBy(ff => ff).ToList();
-            this.RTBFont.SelectedItem = "Times New Roman";
-            if (this.Sermon != null) this.SetUpEditor();
-            BaseRichTextBox.KeyUp += this.BaseRichTextBox_KeyUp;
-            BaseRichTextBox.FontFamily = new FontFamily("Times New Roman");
-            BaseRichTextBox.IsDocumentEnabled = true;
+            // first, get the buttons.
+            foreach (var button in MSFindVisualChildren.FindVisualChildren<Button>(this.BaseFormattingBar))
+            {
+                // prevent buttons from retaining focus; always pass focus back to the rtb;
+                button.Click += (sender, eventArgs) => this.BaseRichTextBox.Focus();
+            }
+            // first, get the comboboxes
+            foreach (var comboBox in MSFindVisualChildren.FindVisualChildren<ComboBox>(this.BaseFormattingBar))
+            {
+                // prevent comboboxes from retaining focus; always pass focus back to the rtb;
+                comboBox.SelectionChanged += (sender, eventArgs) => this.BaseRichTextBox.Focus();
+            }
         }
-
+        /// <summary>
+        /// Determine verses that have been typed or pasted in.
+        /// </summary>
         private void DetectVerses()
         {
             string currStringComposition = this.Text;
@@ -157,126 +159,10 @@ namespace MySermonsWPF.UI
                 }
             }
         }
-        private void BaseRichTextBox_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.OemPeriod)
-            {
-                e.Handled = true;
-
-                Thread thread = new Thread(new ThreadStart(DetectVerses))
-                {
-                    IsBackground = true
-                };
-                thread.Start();
-            }
-            else
-            {
-                e.Handled = false;
-            }
-        }
-
         /// <summary>
-        /// Set the properties of buttons in bulk.
+        /// Alter the state of the metadata panel.
         /// </summary>
-        private void SetButtonsProperties()
-        {
-            // first, get the buttons.
-            foreach (var button in MSFindVisualChildren.FindVisualChildren<Button>(this.BaseFormattingBar))
-            {
-                // prevent buttons from retaining focus; always pass focus back to the rtb;
-                button.Click += (sender, eventArgs) => this.BaseRichTextBox.Focus();
-            }
-            // first, get the comboboxes
-            foreach (var comboBox in MSFindVisualChildren.FindVisualChildren<ComboBox>(this.BaseFormattingBar))
-            {
-                // prevent comboboxes from retaining focus; always pass focus back to the rtb;
-                comboBox.SelectionChanged += (sender, eventArgs) => this.BaseRichTextBox.Focus();
-            }
-        }
-
-        private void SaveCommandExecuted(object target, ExecutedRoutedEventArgs e)
-        {
-            this.Save();
-        }
-
-        private void SaveCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.IsLoaded && !this.IsEmpty();
-        }
-
-        private void OpenCommandExecuted(object target, ExecutedRoutedEventArgs e)
-        {
-            switch (this.BaseMetadataPanel.Visibility)
-            {
-                case Visibility.Collapsed:
-                    this.ToggleMetadataPanelOpening(MetadataPanelToggle.Open);
-                    break;
-                case Visibility.Visible:
-                    this.ToggleMetadataPanelOpening(MetadataPanelToggle.Close);
-                    break;
-            }
-        }
-
-        private void OpenCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
-
-        private void PrintCommandExecuted(object target, ExecutedRoutedEventArgs e)
-        {
-            MessageBox.Show("printing...");
-        }
-
-        private void PrintCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.IsLoaded && !this.IsEmpty();
-        }
-
-        private void FindCommandExecuted(object target, ExecutedRoutedEventArgs e)
-        {
-            MessageBox.Show("finding...");
-        }
-
-        private void FindCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.IsLoaded && !this.IsEmpty();
-        }
-
-        private void PastePlainCommandExecuted(object target, ExecutedRoutedEventArgs e)
-        {
-            //this.documentManager.Insert(Clipboard.GetText());
-        }
-
-        private void PastePlainCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = Clipboard.ContainsText();
-        }
-
-        private void RTBFontSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            foreach (double item in e.AddedItems)
-            {
-                // apply the font size selected
-                this.BaseRichTextBox.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, item);
-            }
-        }
-
-        private void RTBFont_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            foreach (string item in e.AddedItems)
-            {
-                this.BaseRichTextBox.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, new FontFamily(item));
-            }
-        }
-
-        private void BaseRichTextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (this.BaseMetadataPanel.Visibility == Visibility.Visible)
-            {
-                this.ToggleMetadataPanelOpening(MetadataPanelToggle.Close);
-            }
-        }
-
+        /// <param name="toggle"></param>
         private void ToggleMetadataPanelOpening(MetadataPanelToggle toggle)
         {
             switch (toggle)
@@ -293,7 +179,9 @@ namespace MySermonsWPF.UI
                     break;
             }
         }
-
+        /// <summary>
+        /// Extract data from the sermon and populate necessary fields.
+        /// </summary>
         private void SetUpEditor()
         {
             StringBuilder builder = new StringBuilder();
@@ -312,7 +200,9 @@ namespace MySermonsWPF.UI
             this.BaseMetadataPanel.Populate(this.Sermon.Title, speakers, this.Sermon.KeyVerse, this.Sermon.Location.Name, themes, this.Sermon.OtherMetaData);
             this.Rtf = this.Sermon.Content == "CONTENT_NOT_SET" ? string.Empty : this.Sermon.Content;
         }
-
+        /// <summary>
+        /// Permanently save changes made to the sermon.
+        /// </summary>
         private void Save()
         {
             if (this.BaseMetadataPanel.Verify())
@@ -351,19 +241,6 @@ namespace MySermonsWPF.UI
                 MessageBox.Show("Specify sermon title", "Title not set", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
         }
-
-        private void BaseRichTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            //foreach (var arg in e.Changes)
-            //{
-            //    if (arg.AddedLength > 0)
-            //    {
-            //        //string rtbText = documentManager.GetRichText(DataFormats.Text);
-            //        rtbText.ToString();
-            //    }
-            //}
-        }
-
         /// <summary>
         /// Convert the RichTextBox text into rich text in a specified format (currently rtf).
         /// </summary>
@@ -414,7 +291,6 @@ namespace MySermonsWPF.UI
         {
             stream.Seek(0, SeekOrigin.Begin);
         }
-
         /// <summary>
         /// Checks whether content is empty.
         /// </summary>
@@ -426,20 +302,12 @@ namespace MySermonsWPF.UI
             //return string.IsNullOrEmpty(content) || string.IsNullOrWhiteSpace(content);
             return true;
         }
-
-        private void ExpandMetadataPanel_Click(object sender, RoutedEventArgs e)
-        {
-            switch (this.BaseMetadataPanel.Visibility)
-            {
-                case Visibility.Collapsed:
-                    this.ToggleMetadataPanelOpening(MetadataPanelToggle.Open);
-                    break;
-                case Visibility.Visible:
-                    this.ToggleMetadataPanelOpening(MetadataPanelToggle.Close);
-                    break;
-            }
-        }
-
+        /// <summary>
+        /// Looks for all instances of a string within a range.
+        /// </summary>
+        /// <param name="range">The haystack</param>
+        /// <param name="needle">The needle</param>
+        /// <returns></returns>
         private List<TextRange> FindTextInRange(TextRange range, string needle)
         {
             List<TextRange> results = new List<TextRange>();
@@ -459,7 +327,216 @@ namespace MySermonsWPF.UI
             }
             return results;
         }
+        /// <summary>
+        /// Event handler when all controls have been loaded.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MSRichTextBoxLoaded(object sender, RoutedEventArgs e)
+        {
+            this.SetButtonsProperties();
+            this.RTBFontSize.ItemsSource = new double[] { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72 };
+            this.RTBFontSize.SelectedItem = 12D;
+            this.RTBFont.ItemsSource = Fonts.SystemFontFamilies.Select(ff => ff.FamilyNames.Values.First()).OrderBy(ff => ff).ToList();
+            this.RTBFont.SelectedItem = "Times New Roman";
+            if (this.Sermon != null) this.SetUpEditor();
+            BaseRichTextBox.KeyUp += this.BaseRichTextBox_KeyUp;
+            BaseRichTextBox.FontFamily = new FontFamily("Times New Roman");
+            BaseRichTextBox.IsDocumentEnabled = true;
+        }
+        /// <summary>
+        /// Event triggered when a key is released.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BaseRichTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.OemPeriod)
+            {
+                e.Handled = true;
 
+                Thread thread = new Thread(new ThreadStart(DetectVerses))
+                {
+                    IsBackground = true
+                };
+                thread.Start();
+            }
+            else
+            {
+                e.Handled = false;
+            }
+        }
+        /// <summary>
+        /// Event triggered when the save command is executed.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="e"></param>
+        private void SaveCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            this.Save();
+        }
+        /// <summary>
+        /// Event triggered to check if the save command can be executed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.IsLoaded && !this.IsEmpty();
+        }
+        /// <summary>
+        /// Event triggered when the open command is executed.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="e"></param>
+        private void OpenCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            switch (this.BaseMetadataPanel.Visibility)
+            {
+                case Visibility.Collapsed:
+                    this.ToggleMetadataPanelOpening(MetadataPanelToggle.Open);
+                    break;
+                case Visibility.Visible:
+                    this.ToggleMetadataPanelOpening(MetadataPanelToggle.Close);
+                    break;
+            }
+        }
+        /// <summary>
+        /// Event triggered to check if the open command can be executed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OpenCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+        /// <summary>
+        /// Event triggered when the print command is executed.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="e"></param>
+        private void PrintCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("printing...");
+        }
+        /// <summary>
+        /// Event triggered to check if the print command can be executed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PrintCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.IsLoaded && !this.IsEmpty();
+        }
+        /// <summary>
+        /// Event triggered when the find command is executed.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="e"></param>
+        private void FindCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("finding...");
+        }
+        /// <summary>
+        /// Event triggered to check if the find command can be executed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FindCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.IsLoaded && !this.IsEmpty();
+        }
+        /// <summary>
+        /// Event triggered when the paste plain command is executed.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="e"></param>
+        private void PastePlainCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            //this.documentManager.Insert(Clipboard.GetText());
+        }
+        /// <summary>
+        /// Event triggered to check if the paste plain command can be executed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PastePlainCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Clipboard.ContainsText();
+        }
+        /// <summary>
+        /// Event triggered if the font size combobox selection is changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RTBFontSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach (double item in e.AddedItems)
+            {
+                // apply the font size selected
+                this.BaseRichTextBox.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, item);
+            }
+        }
+        /// <summary>
+        /// Event triggered if the font family combobox selection is changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RTBFont_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach (string item in e.AddedItems)
+            {
+                this.BaseRichTextBox.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, new FontFamily(item));
+            }
+        }
+        /// <summary>
+        /// Event triggered when the richtextbox receives focus.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BaseRichTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (this.BaseMetadataPanel.Visibility == Visibility.Visible)
+            {
+                this.ToggleMetadataPanelOpening(MetadataPanelToggle.Close);
+            }
+        }
+        /// <summary>
+        /// Event triggered when the richtextbox content is changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BaseRichTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            //foreach (var arg in e.Changes)
+            //{
+            //    if (arg.AddedLength > 0)
+            //    {
+            //        //string rtbText = documentManager.GetRichText(DataFormats.Text);
+            //        rtbText.ToString();
+            //    }
+            //}
+        }
+        /// <summary>
+        /// Event triggered when the expand metadata panel button is clicked.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExpandMetadataPanel_Click(object sender, RoutedEventArgs e)
+        {
+            switch (this.BaseMetadataPanel.Visibility)
+            {
+                case Visibility.Collapsed:
+                    this.ToggleMetadataPanelOpening(MetadataPanelToggle.Open);
+                    break;
+                case Visibility.Visible:
+                    this.ToggleMetadataPanelOpening(MetadataPanelToggle.Close);
+                    break;
+            }
+        }
+        /// <summary>
+        /// Enum holding values for the different states of the metadata panel.
+        /// </summary>
         private enum MetadataPanelToggle
         {
             Open, Close
