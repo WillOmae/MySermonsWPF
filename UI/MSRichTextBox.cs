@@ -23,6 +23,16 @@ namespace MySermonsWPF.UI
     /// </summary>
     public partial class MSRichTextBox : UserControl
     {
+        public string Rtf
+        {
+            get => GetRtbText(DataFormats.Rtf);
+            set => SetRtbText(value, DataFormats.Rtf);
+        }
+        public string Text
+        {
+            get => GetRtbText(DataFormats.Text);
+            set => SetRtbText(value, DataFormats.Text);
+        }
         /// <summary>
         /// Sermon that is to be manipulated internally.
         /// </summary>
@@ -100,7 +110,7 @@ namespace MySermonsWPF.UI
 
         private void DetectVerses()
         {
-            string currStringComposition = this.GetRtbText(DataFormats.Text);
+            string currStringComposition = this.Text;
             DiffResult diffResults = differ.CreateCharacterDiffs(lastStringComposition, currStringComposition, true);
             lastStringComposition = currStringComposition;
             foreach (DiffBlock diffResult in diffResults.DiffBlocks.Where(diffResult => diffResult.InsertCountB > 0).Select(diffResult => diffResult))
@@ -292,8 +302,7 @@ namespace MySermonsWPF.UI
 
             string speakers = builder.ToString().TrimEnd(',', ' ');
             this.BaseMetadataPanel.Populate(this.sermon.Title, speakers, this.sermon.KeyVerse, this.sermon.Location.Name, themes, this.sermon.OtherMetaData);
-            SetRtbText(this.sermon.Content == "CONTENT_NOT_SET" ? string.Empty : this.sermon.Content, DataFormats.Rtf);
-
+            this.Rtf = this.sermon.Content == "CONTENT_NOT_SET" ? string.Empty : this.sermon.Content;
         }
 
         private void Save()
@@ -306,7 +315,7 @@ namespace MySermonsWPF.UI
                 Location location = string.IsNullOrEmpty(metadata.location) ? null : new Location(metadata.location, StringType.Name);
                 List<Theme> themes = string.IsNullOrEmpty(metadata.themes) ? null : Theme.ExtractFromDelimitedString(metadata.themes, themeDelimiter);
                 List<Speaker> speakers = string.IsNullOrEmpty(metadata.speakers) ? null : Speaker.ExtractFromDelimitedString(metadata.speakers, themeDelimiter);
-                string content = GetRtbText(DataFormats.Rtf);
+                string content = this.Rtf;
                 string title = string.IsNullOrEmpty(metadata.title) ? null : metadata.title;
                 string keyText = string.IsNullOrEmpty(metadata.keytext) ? null : metadata.keytext;
                 string otherMetadata = string.IsNullOrEmpty(metadata.otherinfo) ? null : metadata.otherinfo;
@@ -356,7 +365,7 @@ namespace MySermonsWPF.UI
         /// Convert the RichTextBox text into rich text in a specified format (currently rtf).
         /// </summary>
         /// <returns>A string representation of the rich text.</returns>
-        public string GetRtbText(string dataFormat)
+        private string GetRtbText(string dataFormat)
         {
             TextRange textRange = new TextRange(BaseRichTextBox.Document.ContentStart, BaseRichTextBox.Document.ContentEnd);
             if (textRange.Text.Trim().Length > 0)
@@ -383,7 +392,7 @@ namespace MySermonsWPF.UI
         /// Sets the RichTextBox text from rich text in a specified format (currently rtf).
         /// </summary>
         /// <param name="richText">The string representation of the rich text.</param>
-        public void SetRtbText(string richText, string dataFormat)
+        private void SetRtbText(string richText, string dataFormat)
         {
             if (!string.IsNullOrEmpty(richText))
             {
@@ -428,7 +437,7 @@ namespace MySermonsWPF.UI
             }
         }
 
-        List<TextRange> FindTextInRange(TextRange range, string needle)
+        private List<TextRange> FindTextInRange(TextRange range, string needle)
         {
             List<TextRange> results = new List<TextRange>();
             TextPointer current = range.Start.GetInsertionPosition(LogicalDirection.Forward);
