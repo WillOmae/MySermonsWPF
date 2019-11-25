@@ -36,11 +36,11 @@ namespace MySermonsWPF.UI
         /// <summary>
         /// Sermon that is to be manipulated internally.
         /// </summary>
-        private Sermon sermon = null;
-        private BitmapImage closeIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/collapse.png"));
-        private BitmapImage openIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/expand.png"));
-        private string closePanelTooltip = "Close details panel.";
-        private string openPanelTooltip = "Open details panel";
+        public Sermon Sermon { get; private set; }
+        private readonly BitmapImage closeIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/collapse.png"));
+        private readonly BitmapImage openIcon = new BitmapImage(new Uri("pack://application:,,,/MySermons;component/UI/Resources/expand.png"));
+        private readonly string closePanelTooltip = "Close details panel.";
+        private readonly string openPanelTooltip = "Open details panel";
         /// <summary>
         /// Single chapter e.g. Hebrews 1
         /// </summary>
@@ -82,7 +82,7 @@ namespace MySermonsWPF.UI
         public MSRichTextBox(Sermon sermon)
         {
             this.InitializeComponent();
-            this.sermon = sermon;
+            this.Sermon = sermon;
             this.xmlBible = new XmlBible();
             this.combinedRegex = new Regex(regexBCVrBCV + "|" + regexBCrBC + "|" + regexBCVrCV + "|" + regexBCrC + "|" + regexBCVrV + "|" + regexBCV + "|" + regexBC, RegexOptions.Compiled);
             this.differ = new Differ();
@@ -100,18 +100,16 @@ namespace MySermonsWPF.UI
             this.RTBFontSize.SelectedItem = 12D;
             this.RTBFont.ItemsSource = Fonts.SystemFontFamilies.Select(ff => ff.FamilyNames.Values.First()).OrderBy(ff => ff).ToList();
             this.RTBFont.SelectedItem = "Times New Roman";
-            if (this.sermon != null)
-            {
-                this.SetUpEditor();
-            }
+            if (this.Sermon != null) this.SetUpEditor();
             BaseRichTextBox.KeyUp += this.BaseRichTextBox_KeyUp;
             BaseRichTextBox.FontFamily = new FontFamily("Times New Roman");
+            BaseRichTextBox.IsDocumentEnabled = true;
         }
 
         private void DetectVerses()
         {
             string currStringComposition = this.Text;
-            DiffResult diffResults = differ.CreateCharacterDiffs(lastStringComposition, currStringComposition, true);
+            DiffResult diffResults = differ.CreateCharacterDiffs(lastStringComposition, currStringComposition, false);
             lastStringComposition = currStringComposition;
             foreach (DiffBlock diffResult in diffResults.DiffBlocks.Where(diffResult => diffResult.InsertCountB > 0).Select(diffResult => diffResult))
             {
@@ -138,7 +136,22 @@ namespace MySermonsWPF.UI
                     {
                         this.BaseRichTextBox.Dispatcher.Invoke(() =>
                         {
-                            Hyperlink hyperlink = new Hyperlink(wordRange.Start, wordRange.End);
+                            StringBuilder verseBuilder = new StringBuilder();
+                            foreach (BibleVerse bibleVerse in list)
+                            {
+                                verseBuilder.Append(bibleVerse.BCV);
+                                verseBuilder.Append(" ");
+                                verseBuilder.Append(bibleVerse.Content);
+                                verseBuilder.Append("\n");
+                            }
+                            Hyperlink hyperlink = new Hyperlink(wordRange.Start, wordRange.End)
+                            {
+                                ToolTip = new MSVersePopup()
+                                {
+                                    VerseRef = match.Value,
+                                    VerseContent = verseBuilder.ToString().TrimEnd('\n')
+                                }
+                            };
                         });
                     }
                 }
@@ -281,28 +294,23 @@ namespace MySermonsWPF.UI
             }
         }
 
-        public Sermon GetSermon()
-        {
-            return this.sermon;
-        }
-
         private void SetUpEditor()
         {
             StringBuilder builder = new StringBuilder();
-            foreach (var theme in this.sermon.Themes.Where(theme => theme.Name != "THEME_NOT_SET").Select(theme => theme))
+            foreach (var theme in this.Sermon.Themes.Where(theme => theme.Name != "THEME_NOT_SET").Select(theme => theme))
             {
                 builder = builder.Append(theme.Name).Append(", ");
             }
             string themes = builder.ToString().TrimEnd(',', ' ');
             builder.Clear();
-            foreach (var speaker in this.sermon.Speakers.Where(speaker => speaker.Name != "SPEAKER_NOT_SET").Select(speaker => speaker))
+            foreach (var speaker in this.Sermon.Speakers.Where(speaker => speaker.Name != "SPEAKER_NOT_SET").Select(speaker => speaker))
             {
                 builder = builder.Append(speaker.Name).Append(", ");
             }
 
             string speakers = builder.ToString().TrimEnd(',', ' ');
-            this.BaseMetadataPanel.Populate(this.sermon.Title, speakers, this.sermon.KeyVerse, this.sermon.Location.Name, themes, this.sermon.OtherMetaData);
-            this.Rtf = this.sermon.Content == "CONTENT_NOT_SET" ? string.Empty : this.sermon.Content;
+            this.BaseMetadataPanel.Populate(this.Sermon.Title, speakers, this.Sermon.KeyVerse, this.Sermon.Location.Name, themes, this.Sermon.OtherMetaData);
+            this.Rtf = this.Sermon.Content == "CONTENT_NOT_SET" ? string.Empty : this.Sermon.Content;
         }
 
         private void Save()
@@ -320,21 +328,21 @@ namespace MySermonsWPF.UI
                 string keyText = string.IsNullOrEmpty(metadata.keytext) ? null : metadata.keytext;
                 string otherMetadata = string.IsNullOrEmpty(metadata.otherinfo) ? null : metadata.otherinfo;
 
-                if (this.sermon == null)
+                if (this.Sermon == null)
                 {
                     // the sermon does not exist; create
-                    this.sermon = new Sermon(title, location, themes, speakers, keyText, otherMetadata, content);
-                    MessageBox.Show("Creation success: " + this.sermon.Create());
+                    this.Sermon = new Sermon(title, location, themes, speakers, keyText, otherMetadata, content);
+                    MessageBox.Show("Creation success: " + this.Sermon.Create());
                 }
                 else
                 {
                     // the sermon exists; update
-                    var id = this.sermon.ID;
-                    var guid = this.sermon.GUID;
-                    var dateCreated = this.sermon.DateCreated.Ticks;
+                    var id = this.Sermon.ID;
+                    var guid = this.Sermon.GUID;
+                    var dateCreated = this.Sermon.DateCreated.Ticks;
                     var lastAccessed = DateTime.Now.Ticks;
-                    this.sermon = new Sermon(id, guid, title, location.ID, location.Name, location, themes, speakers, dateCreated, lastAccessed, keyText, otherMetadata, content);
-                    MessageBox.Show("Update successful: " + this.sermon.Update());
+                    this.Sermon = new Sermon(id, guid, title, location.ID, location.Name, location, themes, speakers, dateCreated, lastAccessed, keyText, otherMetadata, content);
+                    MessageBox.Show("Update successful: " + this.Sermon.Update());
                 }
             }
             else
@@ -342,11 +350,6 @@ namespace MySermonsWPF.UI
                 this.ToggleMetadataPanelOpening(MetadataPanelToggle.Open);
                 MessageBox.Show("Specify sermon title", "Title not set", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
-        }
-
-        private enum MetadataPanelToggle
-        {
-            Open, Close
         }
 
         private void BaseRichTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -455,6 +458,11 @@ namespace MySermonsWPF.UI
                 current = current.GetNextContextPosition(LogicalDirection.Forward);
             }
             return results;
+        }
+
+        private enum MetadataPanelToggle
+        {
+            Open, Close
         }
     }
 }

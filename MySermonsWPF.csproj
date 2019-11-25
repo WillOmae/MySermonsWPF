@@ -271,6 +271,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI\MSVersePopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\MSViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -351,6 +355,9 @@
     <Compile Include="UI\MSTabItemHeader.xaml.cs">
       <DependentUpon>MSTabItemHeader.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\MSVersePopup.xaml.cs">
+      <DependentUpon>MSVersePopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MSViewer.xaml.cs">
       <DependentUpon>MSViewer.xaml</DependentUpon>

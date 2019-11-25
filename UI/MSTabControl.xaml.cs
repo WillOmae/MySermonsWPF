@@ -67,11 +67,11 @@ namespace MySermonsWPF.UI
                             // prevent duplicate editors
                             else if (tabItem.Content is MSRichTextBox richTextBox)
                             {
-                                var sermon = richTextBox.GetSermon();
+                                var sermon = richTextBox.Sermon;
                                 var collection = this.BaseTabControl.Items.OfType<TabItem>();
-                                TabItem found = collection.Where(t => t.Content is MSRichTextBox mSRichTextBoxAdv
-                                                                  && mSRichTextBoxAdv.GetSermon() != null
-                                                                  && mSRichTextBoxAdv.GetSermon().Equals(sermon)).FirstOrDefault();
+                                TabItem found = collection.Where(t => t.Content is MSRichTextBox mSRichTextBox
+                                                                  && mSRichTextBox.Sermon != null
+                                                                  && mSRichTextBox.Sermon.Equals(sermon)).FirstOrDefault();
                                 if (found == null)
                                 {
                                     this.BaseTabControl.Items.Add(tabItem);
