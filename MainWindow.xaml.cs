@@ -90,7 +90,7 @@ namespace MySermonsWPF
                 TabItem tabItem = new TabItem()
                 {
                     Header = sermon.Title,
-                    Content = new MSRichTextBoxAdv(sermon)
+                    Content = new MSRichTextBox(sermon)
                 };
                 this.BaseTabControl.Items.Add(tabItem);
                 this.BaseTabControl.SetSelectedItem(tabItem);
@@ -333,7 +333,7 @@ namespace MySermonsWPF
             TabItem tabItem = new TabItem()
             {
                 Header = "New document",
-                Content = new MSRichTextBoxAdv(null)
+                Content = new MSRichTextBox(null)
             };
             this.BaseTabControl.Items.Add(tabItem);
             this.BaseTabControl.SetSelectedItem(tabItem);

@@ -259,7 +259,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\MSRichTextBoxAdv.xaml">
+    <Page Include="UI\MSRichTextBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -341,8 +341,8 @@
     <Compile Include="UI\MSPrinter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UI\MSRichTextBoxAdv.xaml.cs">
-      <DependentUpon>MSRichTextBoxAdv.xaml</DependentUpon>
+    <Compile Include="UI\MSRichTextBox.cs">
+      <DependentUpon>MSRichTextBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MSTabControl.xaml.cs">
       <DependentUpon>MSTabControl.xaml</DependentUpon>

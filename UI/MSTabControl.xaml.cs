@@ -65,11 +65,11 @@ namespace MySermonsWPF.UI
                                 }
                             }
                             // prevent duplicate editors
-                            else if (tabItem.Content is MSRichTextBoxAdv richTextBox)
+                            else if (tabItem.Content is MSRichTextBox richTextBox)
                             {
                                 var sermon = richTextBox.GetSermon();
                                 var collection = this.BaseTabControl.Items.OfType<TabItem>();
-                                TabItem found = collection.Where(t => t.Content is MSRichTextBoxAdv mSRichTextBoxAdv
+                                TabItem found = collection.Where(t => t.Content is MSRichTextBox mSRichTextBoxAdv
                                                                   && mSRichTextBoxAdv.GetSermon() != null
                                                                   && mSRichTextBoxAdv.GetSermon().Equals(sermon)).FirstOrDefault();
                                 if (found == null)

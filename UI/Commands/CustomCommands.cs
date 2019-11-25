@@ -27,5 +27,11 @@ namespace MySermonsWPF.UI.Commands
             name: "Dummy",
             ownerType: typeof(CustomCommands)
             );
+        public static readonly RoutedUICommand Find = new RoutedUICommand(
+            text: "Find",
+            name: "Find",
+            ownerType: typeof(CustomCommands),
+            inputGestures: new InputGestureCollection() { new KeyGesture(Key.F, ModifierKeys.Control) }
+            );
     }
 }
