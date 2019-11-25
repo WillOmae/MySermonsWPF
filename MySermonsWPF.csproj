@@ -230,7 +230,7 @@
     <Compile Include="Data\Sermon.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Data\SermonFilters.cs">
+    <Compile Include="Data\SermonFilter.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Data\SortedSermons.cs">

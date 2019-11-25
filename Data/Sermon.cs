@@ -518,7 +518,7 @@ namespace MySermonsWPF.Data
         /// <param name="filter">The filter to be used.</param>
         /// <param name="sermons">List of sermons to be sorted.</param>
         /// <returns>List of sorted sermons or null.</returns>
-        public static List<SortedSermons> Sort(SermonFilters filter, List<Sermon> sermons)
+        public static List<SortedSermons> Sort(SermonFilter filter, List<Sermon> sermons)
         {
             return sermons == null ? null : SortActuator(filter, sermons);
         }
@@ -529,12 +529,12 @@ namespace MySermonsWPF.Data
         /// <param name="filter">The filter to be used to sort.</param>
         /// <param name="sermons">The non-null list of sermons to be sorted.</param>
         /// <returns>List of sorted sermons.</returns>
-        private static List<SortedSermons> SortActuator(SermonFilters filter, List<Sermon> sermons)
+        private static List<SortedSermons> SortActuator(SermonFilter filter, List<Sermon> sermons)
         {
             List<SortedSermons> sortedSermons = new List<SortedSermons>();
             switch (filter)
             {
-                case SermonFilters.Date:
+                case SermonFilter.Date:
                     HashSet<int> years = new HashSet<int>();
                     foreach (Sermon sermon in sermons)
                     {
@@ -547,7 +547,7 @@ namespace MySermonsWPF.Data
                                                                             select sermon);
                     }
                     break;
-                case SermonFilters.Location:
+                case SermonFilter.Location:
                     var locations = Location.Read();
                     if (locations == null) break;
                     foreach (Location location in locations)
@@ -557,7 +557,7 @@ namespace MySermonsWPF.Data
                                                                           select sermon);
                     }
                     break;
-                case SermonFilters.Title:
+                case SermonFilter.Title:
                     HashSet<char> chars = new HashSet<char>() { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
                     foreach (char c in chars)
                     {
@@ -566,7 +566,7 @@ namespace MySermonsWPF.Data
                                                                          select sermon);
                     }
                     break;
-                case SermonFilters.Theme:
+                case SermonFilter.Theme:
                     var themes = Theme.Read();
                     if (themes == null) break;
                     foreach (Theme theme in themes)
@@ -576,7 +576,7 @@ namespace MySermonsWPF.Data
                                         sermons.Where(sermon => sermon.Themes != null && sermon.Themes.Find(x => x.Name == theme.Name) != null).Select(sermon => sermon).ToList());
                     }
                     break;
-                case SermonFilters.Speaker:
+                case SermonFilter.Speaker:
                     var speakers = Speaker.Read();
                     if (speakers == null) break;
                     foreach (Speaker speaker in speakers)

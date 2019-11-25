@@ -3,7 +3,7 @@
     /// <summary>
     /// enum for filters to be used while sorting sermons.
     /// </summary>
-    public enum SermonFilters
+    public enum SermonFilter
     {
         /// <summary>
         /// Sort by date.

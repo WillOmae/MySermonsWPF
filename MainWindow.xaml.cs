@@ -22,7 +22,7 @@ namespace MySermonsWPF
         public static List<string> ChildContextMenuItems { get; set; }
         public static List<string> ParentContextMenuItems { get; set; }
         public static FontFamily ControlFont => MyFonts.Find(ff => ff.FamilyNames.Values.Contains("Ubuntu"));
-        public SermonFilters CurrentFilter
+        public SermonFilter CurrentFilter
         {
             get
             {
@@ -34,7 +34,7 @@ namespace MySermonsWPF
                 this.SortSermons();
             }
         }
-        private SermonFilters currentFilter = SermonFilters.Location;
+        private SermonFilter currentFilter = SermonFilter.Location;
         private static readonly List<FontFamily> MyFonts = Fonts.GetFontFamilies(new Uri("pack://application:,,,/"), "/UI/Resources/Fonts/").ToList();
         public MainWindow()
         {
@@ -134,20 +134,20 @@ namespace MySermonsWPF
             switch (filterString)
             {
                 case "Date":
-                    CurrentFilter = SermonFilters.Date;
+                    CurrentFilter = SermonFilter.Date;
                     break;
                 case "Location":
                 default:
-                    CurrentFilter = SermonFilters.Location;
+                    CurrentFilter = SermonFilter.Location;
                     break;
                 case "Speaker":
-                    CurrentFilter = SermonFilters.Speaker;
+                    CurrentFilter = SermonFilter.Speaker;
                     break;
                 case "Theme":
-                    CurrentFilter = SermonFilters.Theme;
+                    CurrentFilter = SermonFilter.Theme;
                     break;
                 case "Title":
-                    CurrentFilter = SermonFilters.Title;
+                    CurrentFilter = SermonFilter.Title;
                     break;
             }
         }

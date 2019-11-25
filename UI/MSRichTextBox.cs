@@ -210,11 +210,11 @@ namespace MySermonsWPF.UI
                 char themeDelimiter = ',';
                 (string title, string speakers, string keytext, string location, string themes, string otherinfo) metadata = this.BaseMetadataPanel.GetMetadata();
 
-                Location location = string.IsNullOrEmpty(metadata.location) ? null : new Location(metadata.location, StringType.Name);
-                List<Theme> themes = string.IsNullOrEmpty(metadata.themes) ? null : Theme.ExtractFromDelimitedString(metadata.themes, themeDelimiter);
-                List<Speaker> speakers = string.IsNullOrEmpty(metadata.speakers) ? null : Speaker.ExtractFromDelimitedString(metadata.speakers, themeDelimiter);
-                string content = this.Rtf;
-                string title = string.IsNullOrEmpty(metadata.title) ? null : metadata.title;
+                Location location = string.IsNullOrEmpty(metadata.location) ? new Location("LOCATION_NOT_SET", StringType.Name) : new Location(metadata.location, StringType.Name);
+                List<Theme> themes = string.IsNullOrEmpty(metadata.themes) ? new List<Theme>() { new Theme("THEME_NOT_SET", StringType.Name) } : Theme.ExtractFromDelimitedString(metadata.themes, themeDelimiter);
+                List<Speaker> speakers = string.IsNullOrEmpty(metadata.speakers) ? new List<Speaker>() { new Speaker("SPEAKER_NOT_SET", StringType.Name) } : Speaker.ExtractFromDelimitedString(metadata.speakers, themeDelimiter);
+                string content = Rtf;
+                string title = metadata.title;
                 string keyText = string.IsNullOrEmpty(metadata.keytext) ? null : metadata.keytext;
                 string otherMetadata = string.IsNullOrEmpty(metadata.otherinfo) ? null : metadata.otherinfo;
 
@@ -300,7 +300,7 @@ namespace MySermonsWPF.UI
             //if (!BaseRichTextBox.IsLoaded) return false;
             //var content = new TextRange(BaseRichTextBox.Document.ContentStart, BaseRichTextBox.Document.ContentEnd).Text;
             //return string.IsNullOrEmpty(content) || string.IsNullOrWhiteSpace(content);
-            return true;
+            return false;
         }
         /// <summary>
         /// Looks for all instances of a string within a range.
