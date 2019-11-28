@@ -245,6 +245,7 @@
     <Compile Include="Data\Theme.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Data\Compressor.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
