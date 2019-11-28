@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -128,33 +127,26 @@ namespace MySermonsWPF.UI
                     if (match == null) continue;
                     List<BibleVerse> list = this.xmlBible.Parse(match.Value);
                     if (list == null || list.Count < 1) continue;
-                    List<TextRange> ranges = null;
-                    BaseRichTextBox.Dispatcher.Invoke(() =>
-                    {
-                        TextRange haystack = new TextRange(BaseRichTextBox.Document.ContentStart, BaseRichTextBox.Document.ContentEnd);
-                        ranges = FindTextInRange(haystack, match.Value);
-                    });
+                    TextRange haystack = new TextRange(BaseRichTextBox.Document.ContentStart, BaseRichTextBox.Document.ContentEnd);
+                    List<TextRange> ranges = FindTextInRange(haystack, match.Value);
                     foreach (TextRange wordRange in ranges)
                     {
-                        this.BaseRichTextBox.Dispatcher.Invoke(() =>
+                        StringBuilder verseBuilder = new StringBuilder();
+                        foreach (BibleVerse bibleVerse in list)
                         {
-                            StringBuilder verseBuilder = new StringBuilder();
-                            foreach (BibleVerse bibleVerse in list)
+                            verseBuilder.Append(bibleVerse.BCV);
+                            verseBuilder.Append(" ");
+                            verseBuilder.Append(bibleVerse.Content);
+                            verseBuilder.Append("\n");
+                        }
+                        Hyperlink hyperlink = new Hyperlink(wordRange.Start, wordRange.End)
+                        {
+                            ToolTip = new MSVersePopup()
                             {
-                                verseBuilder.Append(bibleVerse.BCV);
-                                verseBuilder.Append(" ");
-                                verseBuilder.Append(bibleVerse.Content);
-                                verseBuilder.Append("\n");
+                                VerseRef = match.Value,
+                                VerseContent = verseBuilder.ToString().TrimEnd('\n')
                             }
-                            Hyperlink hyperlink = new Hyperlink(wordRange.Start, wordRange.End)
-                            {
-                                ToolTip = new MSVersePopup()
-                                {
-                                    VerseRef = match.Value,
-                                    VerseContent = verseBuilder.ToString().TrimEnd('\n')
-                                }
-                            };
-                        });
+                        };
                     }
                 }
             }
@@ -354,12 +346,7 @@ namespace MySermonsWPF.UI
             if (e.Key == Key.OemPeriod)
             {
                 e.Handled = true;
-
-                Thread thread = new Thread(new ThreadStart(DetectVerses))
-                {
-                    IsBackground = true
-                };
-                thread.Start();
+                DetectVerses();
             }
             else
             {
